@@ -106,7 +106,7 @@ export default function FilterPanel() {
                   Tapahtumat
                 </label>
                 <div className="space-y-1">
-                  {['accident', 'disruption', 'roadwork'].map((catKey) => {
+                  {['accident', 'disruption', 'roadwork', 'weather', 'train', 'police', 'fire', 'transit'].map((catKey) => {
                     const cat = EVENT_CATEGORIES[catKey as keyof typeof EVENT_CATEGORIES];
                     return (
                       <label

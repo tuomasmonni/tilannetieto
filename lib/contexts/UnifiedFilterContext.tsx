@@ -115,7 +115,7 @@ const DEFAULT_STATE: UnifiedFilterState = {
   },
   traffic: {
     timeRange: 'all',
-    categories: ['accident', 'disruption', 'roadwork'],
+    categories: ['accident', 'disruption', 'roadwork', 'weather', 'train', 'police', 'fire', 'transit'],
     layerVisible: true,
   },
   weather: {

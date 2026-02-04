@@ -11,7 +11,7 @@ import type { FintrafficMessageResponse, TrainLocation } from '@/lib/types';
  * Hae liikenneilmoitukset (onnettomuudet, häiriöt)
  */
 export async function fetchTrafficMessages(
-  situationType?: 'TRAFFIC_ANNOUNCEMENT' | 'ROAD_WORK' | 'WEIGHT_RESTRICTION'
+  situationType?: 'TRAFFIC_ANNOUNCEMENT' | 'ROAD_WORK' | 'WEIGHT_RESTRICTION' | 'EXEMPTED_TRANSPORT'
 ): Promise<FintrafficMessageResponse> {
   const url = new URL(API_ENDPOINTS.trafficMessages);
 
@@ -66,9 +66,11 @@ export async function fetchAllTrafficMessages(): Promise<FintrafficMessageRespon
  * Varmistaa että TRAFFIC_ANNOUNCEMENT ja ROAD_WORK molemmat tulevat
  */
 export async function fetchAllTrafficMessagesByType(): Promise<FintrafficMessageResponse> {
-  const situationTypes: Array<'TRAFFIC_ANNOUNCEMENT' | 'ROAD_WORK'> = [
+  const situationTypes: Array<'TRAFFIC_ANNOUNCEMENT' | 'ROAD_WORK' | 'WEIGHT_RESTRICTION' | 'EXEMPTED_TRANSPORT'> = [
     'TRAFFIC_ANNOUNCEMENT',
     'ROAD_WORK',
+    'WEIGHT_RESTRICTION',
+    'EXEMPTED_TRANSPORT',
   ];
 
   // Hae tyypit rinnakkain (parallelointi)

@@ -186,12 +186,26 @@ function isEventFresh(feature: FintrafficFeature): boolean {
 export function transformAllTrafficEvents(
   features: FintrafficFeature[]
 ): NormalizedEvent[] {
-  return features
-    .filter(isEventFresh) // Aikasuodatin - poista vanhat tapahtumat
-    .map(transformTrafficFeature)
-    .filter(event => {
-      // Suodata pois Suomen ulkopuoliset
-      const [lng, lat] = event.location.coordinates;
-      return lng >= 19 && lng <= 32 && lat >= 59 && lat <= 71;
-    });
+  console.log(`[TRANSFORM] Vastaanotettu: ${features.length} tapahtumaa`);
+
+  const fresh = features.filter(isEventFresh);
+  console.log(`[TRANSFORM] Tuoreet: ${fresh.length} tapahtumaa`);
+
+  const transformed = fresh.map(transformTrafficFeature);
+
+  const inBounds = transformed.filter(event => {
+    // Suodata pois Suomen ulkopuoliset
+    const [lng, lat] = event.location.coordinates;
+    return lng >= 19 && lng <= 32 && lat >= 59 && lat <= 71;
+  });
+  console.log(`[TRANSFORM] Suomen rajoissa: ${inBounds.length} tapahtumaa`);
+
+  // Kategoriajakauma
+  const categoryBreakdown = inBounds.reduce((acc, event) => {
+    acc[event.category] = (acc[event.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  console.log(`[TRANSFORM] Kategoriajakauma:`, categoryBreakdown);
+
+  return inBounds;
 }

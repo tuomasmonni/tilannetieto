@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, Suspense } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import type { Map as MapboxMap } from 'mapbox-gl';
 import {
   UnifiedFilterProvider,
@@ -9,6 +9,8 @@ import {
 import type { EventDetails } from '@/lib/types';
 import Header from '@/components/ui/Header';
 import FilterPanel from '@/components/ui/FilterPanel';
+import MobileFilterFAB from '@/components/ui/MobileFilterFAB';
+import MobileFilterSheet from '@/components/ui/MobileFilterSheet';
 import Legend from '@/components/ui/Legend';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import MapContainer from '@/components/map/MapContainer';
@@ -31,6 +33,7 @@ function AppContent() {
   const [map, setMap] = useState<MapboxMap | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { theme } = useUnifiedFilters();
 
   const handleMapReady = useCallback((mapInstance: MapboxMap) => {
@@ -38,15 +41,35 @@ function AppContent() {
     setIsLoading(false);
   }, []);
 
+  // Close sheet when event detail opens
+  useEffect(() => {
+    if (selectedEvent) {
+      setIsSheetOpen(false);
+    }
+  }, [selectedEvent]);
+
   return (
     <main className="relative w-full h-screen bg-zinc-950 overflow-hidden">
       {/* Header */}
       <Header />
 
-      {/* Filter Panel - Left side (hidden on mobile, visible on tablet+) */}
+      {/* Filter Panel - Left side (hidden on mobile, visible on desktop) */}
       <div className="absolute top-20 left-4 z-10 hidden lg:block">
         <FilterPanel />
       </div>
+
+      {/* Mobile Filter FAB (visible only on mobile/tablet) */}
+      <MobileFilterFAB
+        onClick={() => setIsSheetOpen(true)}
+        isDark={theme === 'dark'}
+      />
+
+      {/* Mobile Filter Sheet (visible only on mobile/tablet) */}
+      <MobileFilterSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        isDark={theme === 'dark'}
+      />
 
       {/* Map Container */}
       <MapContainer onMapReady={handleMapReady} theme={theme}>
