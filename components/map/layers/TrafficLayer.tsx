@@ -84,12 +84,63 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
         map.addSource('traffic-events', {
           type: 'geojson',
           data: { type: 'FeatureCollection', features: [] },
+          cluster: true,
+          clusterMaxZoom: 12, // Clusterit hajoavat zoom 12:ssa
+          clusterRadius: 50, // Pisteet yhdistetään jos < 50px toisistaan
         });
 
+        // Cluster-ympyrät
+        map.addLayer({
+          id: 'traffic-events-clusters',
+          type: 'circle',
+          source: 'traffic-events',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': [
+              'step',
+              ['get', 'point_count'],
+              '#f97316', // Orange < 10
+              10,
+              '#ef4444', // Red >= 10
+              50,
+              '#dc2626', // Dark red >= 50
+            ],
+            'circle-radius': [
+              'step',
+              ['get', 'point_count'],
+              15, // < 10 pistettä
+              10,
+              20, // 10-50 pistettä
+              50,
+              25, // >= 50 pistettä
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#fff',
+          },
+        });
+
+        // Cluster-numerointi
+        map.addLayer({
+          id: 'traffic-events-cluster-count',
+          type: 'symbol',
+          source: 'traffic-events',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-color': '#ffffff',
+          },
+        });
+
+        // Yksittäiset ikonit (PIENEMMÄT)
         map.addLayer({
           id: 'traffic-events-icons',
           type: 'symbol',
           source: 'traffic-events',
+          filter: ['!', ['has', 'point_count']], // Näytä vain yksittäiset pisteet
           layout: {
             'icon-image': [
               'match', ['get', 'category'],
@@ -105,13 +156,13 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
             ],
             'icon-size': [
               'interpolate', ['linear'], ['zoom'],
-              4, 0.4,
-              8, 0.6,
-              12, 0.8,
-              16, 1.0
+              4, 0.25,  // Pienempi (oli 0.4)
+              8, 0.4,   // Pienempi (oli 0.6)
+              12, 0.6,  // Pienempi (oli 0.8)
+              16, 0.8   // Pienempi (oli 1.0)
             ],
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
+            'icon-allow-overlap': false, // EI päällekkäin (oli true)
+            'icon-ignore-placement': false, // Huomioi muut symbolit
             'visibility': traffic?.layerVisible ? 'visible' : 'none',
           },
         });
@@ -191,8 +242,30 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
       map.getCanvas().style.cursor = '';
     };
 
+    // Click cluster -> zoom in
+    const handleClusterClick = (e: any) => {
+      const features = e.features;
+      if (!features?.length) return;
+
+      const clusterId = features[0].properties.cluster_id;
+      const source = map.getSource('traffic-events') as any;
+
+      source.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
+        if (err) return;
+
+        map.easeTo({
+          center: features[0].geometry.coordinates,
+          zoom: zoom + 0.5,
+          duration: 500,
+        });
+      });
+    };
+
     map.on('mouseenter', 'traffic-events-icons', handleMouseEnter);
     map.on('mouseleave', 'traffic-events-icons', handleMouseLeave);
+    map.on('mouseenter', 'traffic-events-clusters', handleMouseEnter);
+    map.on('mouseleave', 'traffic-events-clusters', handleMouseLeave);
+    map.on('click', 'traffic-events-clusters', handleClusterClick);
 
     const handleClick = (e: any) => {
       const features = e.features;
@@ -245,7 +318,10 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
       clearInterval(interval);
       map.off('mouseenter', 'traffic-events-icons', handleMouseEnter);
       map.off('mouseleave', 'traffic-events-icons', handleMouseLeave);
+      map.off('mouseenter', 'traffic-events-clusters', handleMouseEnter);
+      map.off('mouseleave', 'traffic-events-clusters', handleMouseLeave);
       map.off('click', 'traffic-events-icons', handleClick);
+      map.off('click', 'traffic-events-clusters', handleClusterClick);
       map.off('style.load', handleStyleLoad);
     };
   }, [map, onEventSelect]);
