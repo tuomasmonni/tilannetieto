@@ -59,8 +59,8 @@ export interface FintrafficMessageResponse {
 export interface FintrafficFeature {
   type: 'Feature';
   geometry: {
-    type: 'Point' | 'LineString' | 'MultiPoint';
-    coordinates: number[] | number[][];
+    type: 'Point' | 'LineString' | 'MultiPoint' | 'MultiLineString';
+    coordinates: number[] | number[][] | number[][][];
   };
   properties: {
     situationId: string;

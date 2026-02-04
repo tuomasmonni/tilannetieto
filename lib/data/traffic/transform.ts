@@ -75,23 +75,80 @@ function determineSeverity(feature: FintrafficFeature): 'low' | 'medium' | 'high
  * Hae koordinaatit geometriasta
  */
 function getCoordinates(geometry: FintrafficFeature['geometry']): [number, number] {
+  // 1. Point-geometria
   if (geometry.type === 'Point') {
-    return geometry.coordinates as [number, number];
+    const coords = geometry.coordinates as [number, number];
+    if (Array.isArray(coords) && coords.length === 2 &&
+        typeof coords[0] === 'number' && typeof coords[1] === 'number' &&
+        coords[0] >= 19 && coords[0] <= 32 &&
+        coords[1] >= 59 && coords[1] <= 71) {
+      return coords;
+    }
   }
 
-  if (geometry.type === 'MultiPoint' || geometry.type === 'LineString') {
-    // Ota ensimmäinen piste
+  // 2. LineString tai MultiPoint
+  if (geometry.type === 'LineString' || geometry.type === 'MultiPoint') {
     const coords = geometry.coordinates as number[][];
-    return coords[0] as [number, number];
+
+    if (Array.isArray(coords) && coords.length > 0) {
+      const firstPoint = coords[0];
+
+      if (Array.isArray(firstPoint) && firstPoint.length >= 2 &&
+          typeof firstPoint[0] === 'number' && typeof firstPoint[1] === 'number') {
+
+        const lng = firstPoint[0];
+        const lat = firstPoint[1];
+
+        // Validoi Suomen rajat
+        if (lng >= 19 && lng <= 32 && lat >= 59 && lat <= 71) {
+          return [lng, lat];
+        }
+      }
+    }
   }
 
-  return [25.0, 65.0]; // Fallback keskelle Suomea
+  // 3. MultiLineString - ota ensimmäisen linjan ensimmäinen piste
+  if (geometry.type === 'MultiLineString') {
+    const lines = geometry.coordinates as number[][][];
+
+    if (Array.isArray(lines) && lines.length > 0) {
+      const firstLine = lines[0];
+
+      if (Array.isArray(firstLine) && firstLine.length > 0) {
+        const firstPoint = firstLine[0];
+
+        if (Array.isArray(firstPoint) && firstPoint.length >= 2 &&
+            typeof firstPoint[0] === 'number' && typeof firstPoint[1] === 'number') {
+
+          const lng = firstPoint[0];
+          const lat = firstPoint[1];
+
+          // Validoi Suomen rajat
+          if (lng >= 19 && lng <= 32 && lat >= 59 && lat <= 71) {
+            return [lng, lat];
+          }
+        }
+      }
+    }
+  }
+
+  // 4. Fallback (vain jos kaikki muu epäonnistuu)
+  console.warn(`[TRANSFORM] Invalid geometry, using fallback:`, geometry.type);
+  return [25.0, 65.0];
 }
 
 /**
  * Muunna Fintraffic feature normalisoiduksi tapahtumaksi
  */
 export function transformTrafficFeature(feature: FintrafficFeature): NormalizedEvent {
+  // DEBUG: Logaa ei-Point geometriat
+  if (feature.geometry.type !== 'Point') {
+    console.log(`[TRANSFORM] Non-Point geometry: ${feature.geometry.type}`, {
+      situationId: feature.properties.situationId,
+      coordinates: feature.geometry.coordinates,
+    });
+  }
+
   const announcement = feature.properties.announcements?.find(a => a.language === 'FI')
     || feature.properties.announcements?.[0];
 
@@ -155,25 +212,34 @@ export function transformTrainLocation(train: TrainLocation): NormalizedEvent {
 function isEventFresh(feature: FintrafficFeature): boolean {
   const announcement = feature.properties.announcements?.[0];
   const now = new Date();
+  const situationType = feature.properties.situationType;
 
-  // Tarkista onko tapahtuma päättynyt
+  // 1. Tarkista onko tapahtuma päättynyt
   if (announcement?.timeAndDuration?.endTime) {
     const endTime = new Date(announcement.timeAndDuration.endTime);
-
-    // Jos päättyi yli tunti sitten → filtteröi pois
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     if (endTime < oneHourAgo) {
       return false;
     }
   }
 
-  // Tarkista onko tapahtuma liian vanha (alkanut yli 7 päivää sitten)
+  // 2. Eri logiikka eri tyypeille
   if (announcement?.timeAndDuration?.startTime) {
     const startTime = new Date(announcement.timeAndDuration.startTime);
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    if (startTime < sevenDaysAgo) {
-      return false;
+    // TIETYÖT: 14 päivän ikkuna (pitkäkestoiset)
+    if (situationType === 'ROAD_WORK') {
+      const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+      if (startTime < fourteenDaysAgo) {
+        return false;
+      }
+    }
+    // MUUT: 7 päivän ikkuna
+    else {
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      if (startTime < sevenDaysAgo) {
+        return false;
+      }
     }
   }
 
@@ -194,11 +260,20 @@ export function transformAllTrafficEvents(
   const transformed = fresh.map(transformTrafficFeature);
 
   const inBounds = transformed.filter(event => {
-    // Suodata pois Suomen ulkopuoliset
     const [lng, lat] = event.location.coordinates;
+
+    // Hylkää fallback-koordinaatit (25, 65)
+    if (lng === 25.0 && lat === 65.0) {
+      console.warn(`[TRANSFORM] Rejected fallback for: ${event.id}`);
+      return false;
+    }
+
+    // Suodata pois Suomen ulkopuoliset
     return lng >= 19 && lng <= 32 && lat >= 59 && lat <= 71;
   });
-  console.log(`[TRANSFORM] Suomen rajoissa: ${inBounds.length} tapahtumaa`);
+
+  console.log(`[TRANSFORM] Suomen rajoissa (ilman fallbackia): ${inBounds.length} tapahtumaa`);
+  console.log(`[TRANSFORM] Hylätty (fallback): ${transformed.length - inBounds.length} tapahtumaa`);
 
   // Kategoriajakauma
   const categoryBreakdown = inBounds.reduce((acc, event) => {

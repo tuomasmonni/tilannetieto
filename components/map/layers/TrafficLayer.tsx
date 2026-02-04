@@ -161,8 +161,8 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
               12, 0.6,  // Pienempi (oli 0.8)
               16, 0.8   // Pienempi (oli 1.0)
             ],
-            'icon-allow-overlap': false, // EI päällekkäin (oli true)
-            'icon-ignore-placement': false, // Huomioi muut symbolit
+            'icon-allow-overlap': true, // Näytä kaikki, myös päällekkäiset
+            'icon-ignore-placement': true, // Älä huomioi muita symboleja
             'visibility': traffic?.layerVisible ? 'visible' : 'none',
           },
         });
