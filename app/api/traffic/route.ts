@@ -26,16 +26,30 @@ export async function GET() {
     }
 
     console.log('🔄 Traffic cache miss, fetching from API...');
-    const data = await fetchAllTrafficMessages();
+    let data;
+    try {
+      data = await fetchAllTrafficMessages();
+    } catch (fetchErr) {
+      console.error('❌ Failed to fetch from Digitraffic API:', fetchErr);
+      // Fallback: palauta tyhjä GeoJSON jos API failaa
+      return NextResponse.json({
+        type: 'FeatureCollection',
+        features: [],
+      }, {
+        headers: {
+          'Cache-Control': 'public, max-age=30',
+          'X-Cache': 'ERROR',
+        },
+      });
+    }
 
     // Muunna normalisoiduiksi tapahtumiksi
     const events = transformAllTrafficEvents(data.features);
 
     // Tallenna historiaan (asynkronisesti, ei odoteta)
-    updateHistory(events).then(stats => {
-      console.log(`History: ${stats.newEvents} new, ${stats.closedEvents} closed, ${stats.totalEvents} total`);
-    }).catch(err => {
-      console.error('History update failed:', err);
+    // TÄRKEÄ: Ei odoteta, jotta vaikka tämä failaa, data silti palautuu
+    updateHistory(events).catch(err => {
+      console.error('⚠️  History update failed (non-blocking):', err);
     });
 
     // Muunna GeoJSON FeatureCollectioniksi
@@ -65,8 +79,10 @@ export async function GET() {
       })),
     };
 
-    // 2. Tallenna cacheen (60 sekunnin TTL)
-    await setCached('traffic:all', geojson, 60);
+    // 2. Tallenna cacheen (60 sekunnin TTL) - fail-safe
+    setCached('traffic:all', geojson, 60).catch(err => {
+      console.error('⚠️  Cache save failed (non-blocking):', err);
+    });
 
     return NextResponse.json(geojson, {
       headers: {
