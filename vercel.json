@@ -1,7 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "ignoreCommand": "git diff --quiet HEAD~ HEAD -- lib/data/crime/crime-statistics.json > /dev/null",
   "regions": ["fra1"],
   "functions": {
     "api/traffic/route.ts": {
