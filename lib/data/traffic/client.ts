@@ -75,21 +75,3 @@ export async function fetchTrainLocations(): Promise<TrainLocation[]> {
   return response.json();
 }
 
-/**
- * Hae kelikamerat
- */
-export async function fetchWeatherCameras(): Promise<any> {
-  const response = await fetch(API_ENDPOINTS.weatherCameras, {
-    headers: {
-      'Accept-Encoding': 'gzip',
-      'Accept': 'application/json',
-    },
-    next: { revalidate: 300 }, // Cache 5 min
-  });
-
-  if (!response.ok) {
-    throw new Error(`Weathercam API error: ${response.status}`);
-  }
-
-  return response.json();
-}
