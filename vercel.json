@@ -3,29 +3,29 @@
   "outputDirectory": ".next",
   "regions": ["fra1"],
   "functions": {
-    "api/traffic/route.ts": {
+    "app/api/traffic/route.ts": {
       "memory": 1024,
       "maxDuration": 60
     },
-    "api/weather/route.ts": {
+    "app/api/weather/route.ts": {
       "memory": 512,
       "maxDuration": 60
     },
-    "api/transit/route.ts": {
+    "app/api/transit/route.ts": {
       "memory": 512,
       "maxDuration": 60
     },
-    "api/history/route.ts": {
+    "app/api/crime-stats/route.ts": {
       "memory": 512,
       "maxDuration": 30
     },
-    "api/roadmap/route.ts": {
+    "app/api/road-weather/route.ts": {
       "memory": 512,
       "maxDuration": 30
     },
-    "api/roadmap/vote/route.ts": {
-      "memory": 256,
-      "maxDuration": 10
+    "app/api/weathercam/route.ts": {
+      "memory": 512,
+      "maxDuration": 30
     }
   }
 }
