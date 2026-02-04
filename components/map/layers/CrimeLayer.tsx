@@ -115,7 +115,8 @@ export function CrimeLayer({ map }: CrimeLayerProps) {
           },
         });
 
-        // Lisää reunaviivat
+        // Lisää reunaviivat - tema-agnostiikka
+        // Käytä tummaa väriä hovernissa ja erittäin vaaleataa normaalissa tilassa
         map.addLayer({
           id: 'crime-outline',
           type: 'line',
@@ -124,14 +125,14 @@ export function CrimeLayer({ map }: CrimeLayerProps) {
             'line-color': [
               'case',
               ['boolean', ['feature-state', 'hover'], false],
-              '#ffffff',
-              '#374151'
+              '#1f2937',  // Tumma hovernissa (näkyy myös vaalealla taustalla)
+              '#d1d5db'   // Vaalea normaalissa (näkyy myös tummalla taustalla)
             ],
             'line-width': [
               'case',
               ['boolean', ['feature-state', 'hover'], false],
-              2,
-              0.5
+              2.5,
+              1
             ],
           },
         });
