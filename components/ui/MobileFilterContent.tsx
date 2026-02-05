@@ -23,8 +23,8 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
     setWeatherCameraLayerVisible,
   } = useUnifiedFilters();
 
-  const [crimeExpanded, setCrimeExpanded] = useState(true);
-  const [weatherCameraExpanded, setWeatherCameraExpanded] = useState(false);
+  const [crimeExpanded, setCrimeExpanded] = useState(false);
+  const [weatherCameraExpanded, setWeatherCameraExpanded] = useState(true);
 
   const isDark = theme === 'dark';
   const textClass = isDark ? 'text-zinc-200' : 'text-zinc-800';
@@ -44,19 +44,6 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
           </label>
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setCrimeLayerVisible(!crime.layerVisible)}
-              className={`
-                px-4 py-2.5 rounded-lg text-sm font-medium
-                transition-colors min-h-[44px]
-                ${crime.layerVisible
-                  ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
-                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
-                }
-              `}
-            >
-              🔴 Rikostilastot
-            </button>
-            <button
               onClick={() => setWeatherCameraLayerVisible(!weatherCamera.layerVisible)}
               className={`
                 px-4 py-2.5 rounded-lg text-sm font-medium
@@ -69,6 +56,19 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
             >
               📷 Kelikamerat
             </button>
+            <button
+              onClick={() => setCrimeLayerVisible(!crime.layerVisible)}
+              className={`
+                px-4 py-2.5 rounded-lg text-sm font-medium
+                transition-colors min-h-[44px]
+                ${crime.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+                }
+              `}
+            >
+              🔴 Rikostilastot
+            </button>
           </div>
         </div>
       </div>
@@ -78,6 +78,53 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
   // Expanded mode: Full filter panel (mobiili-optimoitu)
   return (
     <div className="p-5 space-y-6">
+      {/* ========== KELIKAMERAT ========== */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => setWeatherCameraExpanded(!weatherCameraExpanded)}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} min-h-[44px]`}
+          >
+            <span>📷</span>
+            <span>KELIKAMERAT</span>
+            <span
+              className={`transition-transform text-xs ml-auto ${
+                weatherCameraExpanded ? 'rotate-180' : ''
+              }`}
+            >
+              ▼
+            </span>
+          </button>
+
+          <button
+            onClick={() => setWeatherCameraLayerVisible(!weatherCamera.layerVisible)}
+            className={`
+              px-3 py-1.5 rounded text-xs font-medium
+              transition-colors min-h-[44px] min-w-[60px]
+              ${weatherCamera.layerVisible
+                ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+              }
+            `}
+          >
+            {weatherCamera.layerVisible ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        {weatherCameraExpanded && (
+          <div className="space-y-3 pt-2">
+            <p className={`text-sm ${textMutedClass}`}>
+              {weatherCamera.layerVisible
+                ? '~300 kelikamera-asemaa kartalla'
+                : 'Kelikamerat piilotettu'}
+            </p>
+            <p className={`text-xs ${textMutedClass} italic`}>
+              Klikkaa kamera-ikonia kartalla nähdäksesi kuvat
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* ========== RIKOSTILASTOT ========== */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -202,53 +249,6 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
                 ))}
               </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* ========== KELIKAMERAT ========== */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <button
-            onClick={() => setWeatherCameraExpanded(!weatherCameraExpanded)}
-            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} min-h-[44px]`}
-          >
-            <span>📷</span>
-            <span>KELIKAMERAT</span>
-            <span
-              className={`transition-transform text-xs ml-auto ${
-                weatherCameraExpanded ? 'rotate-180' : ''
-              }`}
-            >
-              ▼
-            </span>
-          </button>
-
-          <button
-            onClick={() => setWeatherCameraLayerVisible(!weatherCamera.layerVisible)}
-            className={`
-              px-3 py-1.5 rounded text-xs font-medium
-              transition-colors min-h-[44px] min-w-[60px]
-              ${weatherCamera.layerVisible
-                ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
-                : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
-              }
-            `}
-          >
-            {weatherCamera.layerVisible ? 'ON' : 'OFF'}
-          </button>
-        </div>
-
-        {weatherCameraExpanded && (
-          <div className="space-y-3 pt-2">
-            <p className={`text-sm ${textMutedClass}`}>
-              {weatherCamera.layerVisible
-                ? '~300 kelikamera-asemaa kartalla'
-                : 'Kelikamerat piilotettu'}
-            </p>
-            <p className={`text-xs ${textMutedClass} italic`}>
-              Klikkaa kamera-ikonia kartalla nähdäksesi kuvat
-            </p>
           </div>
         )}
       </div>
