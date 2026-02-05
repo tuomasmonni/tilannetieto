@@ -19,9 +19,16 @@ export default function FilterPanel() {
     setWeatherCameraLayerVisible,
   } = useUnifiedFilters();
 
-  const [crimeExpanded, setCrimeExpanded] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<string | null>('weatherCamera');
   const [crimeInfoExpanded, setCrimeInfoExpanded] = useState(false);
-  const [weatherCameraExpanded, setWeatherCameraExpanded] = useState(true);
+
+  const toggleSection = (section: string) => {
+    setExpandedSection(prev => prev === section ? null : section);
+    if (section !== 'crime') setCrimeInfoExpanded(false);
+  };
+
+  const crimeExpanded = expandedSection === 'crime';
+  const weatherCameraExpanded = expandedSection === 'weatherCamera';
 
   const isDark = theme === 'dark';
   const bgClass = isDark ? 'bg-zinc-900/95 border-zinc-700' : 'bg-white/95 border-zinc-200';
@@ -37,7 +44,7 @@ export default function FilterPanel() {
         <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => setWeatherCameraExpanded(!weatherCameraExpanded)}
+              onClick={() => toggleSection('weatherCamera')}
               className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} ${isDark ? 'hover:text-white' : 'hover:text-zinc-900'}`}
             >
               <span>📷</span>
@@ -82,7 +89,7 @@ export default function FilterPanel() {
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => setCrimeExpanded(!crimeExpanded)}
+            onClick={() => toggleSection('crime')}
             className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} ${isDark ? 'hover:text-white' : 'hover:text-zinc-900'}`}
           >
             <span>🔴</span>
