@@ -32,6 +32,7 @@ const filterByCategory = (data: EventFeatureCollection, categories: EventCategor
 export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) {
   const { traffic } = useUnifiedFilters();
   const [allData, setAllData] = useState<EventFeatureCollection | null>(null);
+  const [layersReady, setLayersReady] = useState(false);
   const filtersRef = useRef(traffic);
 
   useEffect(() => {
@@ -155,10 +156,21 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
         const url = hours > 0
           ? `/api/history?hours=${hours}&includeInactive=true`
           : '/api/traffic';
+        console.log('[TrafficLayer] Fetching:', url);
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to fetch');
+        if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
         const data: EventFeatureCollection = await response.json();
+        console.log(`[TrafficLayer] Fetched ${data.features.length} events`);
         setAllData(data);
+
+        // Also set data directly on source if it exists (avoids race condition)
+        const source = map.getSource('traffic-events');
+        if (source && 'setData' in source) {
+          const categories = filtersRef.current?.categories || [];
+          const filtered = filterByCategory(data, categories);
+          console.log(`[TrafficLayer] Direct setData: ${filtered.features.length} filtered events`);
+          source.setData(filtered);
+        }
       } catch (error) {
         console.error('Failed to fetch traffic data:', error);
       }
@@ -168,7 +180,9 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
 
     const initMap = async () => {
       await addSourceAndLayers();
-      fetchData();
+      console.log('[TrafficLayer] Layers ready, fetching data...');
+      setLayersReady(true);
+      await fetchData();
     };
 
     if (map.isStyleLoaded()) {
@@ -179,7 +193,9 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
 
     const handleStyleLoad = async () => {
       await new Promise(resolve => setTimeout(resolve, 100));
+      setLayersReady(false);
       await addSourceAndLayers();
+      setLayersReady(true);
     };
     map.on('style.load', handleStyleLoad);
 
@@ -263,13 +279,14 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
 
   // Update map when data or filters change
   useEffect(() => {
-    if (!map || !allData) return;
+    if (!map || !allData || !layersReady) return;
     const filtered = filterByCategory(allData, traffic?.categories || []);
     const source = map.getSource('traffic-events');
     if (source && 'setData' in source) {
+      console.log(`[TrafficLayer] Filter effect: ${filtered.features.length} events on map`);
       source.setData(filtered);
     }
-  }, [map, allData, traffic?.categories]);
+  }, [map, allData, traffic?.categories, layersReady]);
 
   // Visibility
   useEffect(() => {
