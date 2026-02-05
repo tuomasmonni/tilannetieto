@@ -69,12 +69,12 @@ const DEFAULT_STATE: UnifiedFilterState = {
   crime: {
     year: '2024',
     categories: ['SSS'],
-    layerVisible: true, // Rikostilastot oletuksena PÄÄLLÄ
+    layerVisible: false,
     isLoading: false,
     displayMode: 'absolute',
   },
   weatherCamera: {
-    layerVisible: false,
+    layerVisible: true, // Kelikamerat oletuksena PÄÄLLÄ
     selectedStationId: null,
   },
   theme: 'dark',
