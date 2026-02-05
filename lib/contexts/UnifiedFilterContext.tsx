@@ -7,7 +7,7 @@ import {
   useCallback,
   ReactNode,
 } from 'react';
-import { CRIME_CATEGORIES, AVAILABLE_YEARS, type MapTheme, type EventCategory } from '@/lib/constants';
+import { CRIME_CATEGORIES, AVAILABLE_YEARS, type MapTheme, type EventCategory, type NewsCategoryKey, type NewsSourceKey } from '@/lib/constants';
 
 // ============================================
 // RE-EXPORT CONSTANTS
@@ -39,7 +39,7 @@ interface UnifiedFilterState {
     layerVisible: boolean;
   };
 
-  // Sää (FMI)
+  // Saa (FMI)
   weather: {
     layerVisible: boolean;
     metric: WeatherMetric;
@@ -51,7 +51,7 @@ interface UnifiedFilterState {
     vehicleTypes: TransitVehicleType[];
   };
 
-  // Tiesää (Digitraffic)
+  // Tiesaa (Digitraffic)
   roadWeather: {
     layerVisible: boolean;
   };
@@ -60,6 +60,15 @@ interface UnifiedFilterState {
   weatherCamera: {
     layerVisible: boolean;
     selectedStationId: string | null;
+  };
+
+  // Uutiset (RSS + AI)
+  news: {
+    layerVisible: boolean;
+    timeRange: '1h' | '6h' | '24h' | '7d' | '30d';
+    sources: NewsSourceKey[];
+    categories: NewsCategoryKey[];
+    searchQuery: string;
   };
 
   // Yleiset asetukset
@@ -99,6 +108,13 @@ interface UnifiedFilterActions {
   setWeatherCameraLayerVisible: (visible: boolean) => void;
   setSelectedWeatherCamera: (stationId: string | null) => void;
 
+  // News actions
+  setNewsLayerVisible: (visible: boolean) => void;
+  setNewsTimeRange: (timeRange: '1h' | '6h' | '24h' | '7d' | '30d') => void;
+  toggleNewsSource: (source: NewsSourceKey) => void;
+  toggleNewsCategory: (category: NewsCategoryKey) => void;
+  setNewsSearchQuery: (query: string) => void;
+
   // General actions
   setTheme: (theme: MapTheme) => void;
   resetFilters: () => void;
@@ -135,6 +151,13 @@ const DEFAULT_STATE: UnifiedFilterState = {
   weatherCamera: {
     layerVisible: false,
     selectedStationId: null,
+  },
+  news: {
+    layerVisible: false,
+    timeRange: '24h',
+    sources: ['yle', 'iltalehti', 'mtv'],
+    categories: ['liikenne', 'rikos', 'politiikka', 'terveys', 'ymparisto', 'talous', 'urheilu', 'onnettomuus', 'muu'],
+    searchQuery: '',
   },
   theme: 'dark',
 };
@@ -179,7 +202,6 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
       const currentCategories = prev.crime.categories;
       const isSelected = currentCategories.includes(code);
 
-      // SSS logic: SSS is "all crimes", can't combine with others
       if (code === 'SSS') {
         return {
           ...prev,
@@ -190,12 +212,10 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
         };
       }
 
-      // Toggle other categories
       let newCategories: string[];
       if (isSelected) {
         newCategories = currentCategories.filter(c => c !== code);
       } else {
-        // Remove SSS if selecting specific category
         newCategories = [
           ...currentCategories.filter(c => c !== 'SSS'),
           code,
@@ -219,6 +239,7 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
       transit: { ...prev.transit, layerVisible: activeLayer === 'transit' },
       roadWeather: { ...prev.roadWeather, layerVisible: activeLayer === 'roadWeather' },
       weatherCamera: { ...prev.weatherCamera, layerVisible: activeLayer === 'weatherCamera' },
+      news: { ...prev.news, layerVisible: activeLayer === 'news' },
     });
   }, []);
 
@@ -335,6 +356,55 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     }));
   }, []);
 
+  // ========== NEWS ACTIONS ==========
+
+  const setNewsLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => visible ? turnOffOtherLayers('news')(prev) : ({
+      ...prev,
+      news: { ...prev.news, layerVisible: false },
+    }));
+  }, [turnOffOtherLayers]);
+
+  const setNewsTimeRange = useCallback((timeRange: '1h' | '6h' | '24h' | '7d' | '30d') => {
+    setState(prev => ({
+      ...prev,
+      news: { ...prev.news, timeRange },
+    }));
+  }, []);
+
+  const toggleNewsSource = useCallback((source: NewsSourceKey) => {
+    setState(prev => {
+      const sources = prev.news.sources;
+      const newSources = sources.includes(source)
+        ? sources.filter(s => s !== source)
+        : [...sources, source];
+      return {
+        ...prev,
+        news: { ...prev.news, sources: newSources },
+      };
+    });
+  }, []);
+
+  const toggleNewsCategory = useCallback((category: NewsCategoryKey) => {
+    setState(prev => {
+      const cats = prev.news.categories;
+      const newCats = cats.includes(category)
+        ? cats.filter(c => c !== category)
+        : [...cats, category];
+      return {
+        ...prev,
+        news: { ...prev.news, categories: newCats },
+      };
+    });
+  }, []);
+
+  const setNewsSearchQuery = useCallback((query: string) => {
+    setState(prev => ({
+      ...prev,
+      news: { ...prev.news, searchQuery: query },
+    }));
+  }, []);
+
   // ========== GENERAL ACTIONS ==========
 
   const setTheme = useCallback((theme: MapTheme) => {
@@ -365,6 +435,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
     setSelectedWeatherCamera,
+    setNewsLayerVisible,
+    setNewsTimeRange,
+    toggleNewsSource,
+    toggleNewsCategory,
+    setNewsSearchQuery,
     setTheme,
     resetFilters,
   };

@@ -1,6 +1,6 @@
 /**
- * Tilannekuva.online - Yhdistetyt vakiot
- * Sisältää sekä liikenteen että rikostilastojen konfiguraation
+ * Tilannetieto.fi - Yhdistetyt vakiot
+ * Sisältää liikenteen, rikostilastojen ja uutisten konfiguraation
  */
 
 // ============================================
@@ -34,61 +34,61 @@ export const EVENT_CATEGORIES = {
     color: '#ef4444',
     icon: 'car',
     label: 'Onnettomuus',
-    emoji: '🚗',
+    emoji: '\u{1F697}',
   },
   disruption: {
     color: '#f97316',
     icon: 'alert-triangle',
-    label: 'Häiriö',
-    emoji: '⚠️',
+    label: 'H\u00e4iri\u00f6',
+    emoji: '\u26A0\uFE0F',
   },
   roadwork: {
     color: '#eab308',
     icon: 'construction',
-    label: 'Tietyö',
-    emoji: '🚧',
+    label: 'Tiety\u00f6',
+    emoji: '\u{1F6A7}',
   },
   train: {
     color: '#22c55e',
     icon: 'train',
     label: 'Juna',
-    emoji: '🚂',
+    emoji: '\u{1F682}',
   },
   camera: {
     color: '#3b82f6',
     icon: 'camera',
     label: 'Kelikamera',
-    emoji: '📷',
+    emoji: '\u{1F4F7}',
   },
   police: {
     color: '#6366f1',
     icon: 'shield',
     label: 'Poliisi',
-    emoji: '🚔',
+    emoji: '\u{1F694}',
   },
   fire: {
     color: '#dc2626',
     icon: 'flame',
     label: 'Tulipalo',
-    emoji: '🔥',
+    emoji: '\u{1F525}',
   },
   weather: {
     color: '#06b6d4',
     icon: 'cloud',
-    label: 'Sää',
-    emoji: '⛈️',
+    label: 'S\u00e4\u00e4',
+    emoji: '\u26C8\uFE0F',
   },
   transit: {
     color: '#10b981',
     icon: 'bus',
     label: 'Joukkoliikenne',
-    emoji: '🚌',
+    emoji: '\u{1F68C}',
   },
   road_weather: {
     color: '#8b5cf6',
     icon: 'thermometer',
-    label: 'Tiesää',
-    emoji: '🌡️',
+    label: 'Ties\u00e4\u00e4',
+    emoji: '\u{1F321}\uFE0F',
   },
 } as const;
 
@@ -101,7 +101,7 @@ export type EventCategory = keyof typeof EVENT_CATEGORIES;
 export const CRIME_CATEGORIES = [
   { code: 'SSS', label: 'Kaikki rikokset', color: '#6b7280' },
   { code: '010000', label: 'Henkirikokset', color: '#dc2626' },
-  { code: '020000', label: 'Väkivaltarikokset', color: '#ea580c' },
+  { code: '020000', label: 'V\u00e4kivaltarikokset', color: '#ea580c' },
   { code: '030000', label: 'Seksuaalirikokset', color: '#d946ef' },
   { code: '050000', label: 'Omaisuusrikokset', color: '#2563eb' },
   { code: '060000', label: 'Huumausainerikokset', color: '#65a30d' },
@@ -125,6 +125,7 @@ export const POLLING_INTERVALS = {
   weather: 300_000,   // 5 min (FMI)
   transit: 15_000,    // 15 sec (HSL GTFS-RT)
   roadWeather: 300_000, // 5 min (Digitraffic)
+  news: 900_000,      // 15 min (RSS feeds)
 } as const;
 
 export const API_ENDPOINTS = {
@@ -138,7 +139,33 @@ export const API_ENDPOINTS = {
 
 export const SITUATION_TYPES = {
   TRAFFIC_ANNOUNCEMENT: 'Liikenneilmoitus',
-  ROAD_WORK: 'Tietyö',
+  ROAD_WORK: 'Tiety\u00f6',
   WEIGHT_RESTRICTION: 'Painorajoitus',
   EXEMPTED_TRANSPORT: 'Erikoiskuljetus',
 } as const;
+
+// ============================================
+// UUTISET - NEWS KATEGORIAT
+// ============================================
+
+export const NEWS_CATEGORIES = {
+  liikenne:     { label: 'Liikenne',      color: '#3b82f6', emoji: '\u{1F697}' },
+  rikos:        { label: 'Rikos',          color: '#ef4444', emoji: '\u{1F534}' },
+  politiikka:   { label: 'Politiikka',    color: '#8b5cf6', emoji: '\u{1F3DB}\uFE0F' },
+  terveys:      { label: 'Terveys',       color: '#10b981', emoji: '\u{1F3E5}' },
+  ymparisto:    { label: 'Ymp\u00e4rist\u00f6',     color: '#22c55e', emoji: '\u{1F33F}' },
+  talous:       { label: 'Talous',        color: '#f59e0b', emoji: '\u{1F4B0}' },
+  urheilu:      { label: 'Urheilu',       color: '#06b6d4', emoji: '\u26BD' },
+  onnettomuus:  { label: 'Onnettomuus',   color: '#dc2626', emoji: '\u{1F6A8}' },
+  muu:          { label: 'Muu',           color: '#6b7280', emoji: '\u{1F4F0}' },
+} as const;
+
+export type NewsCategoryKey = keyof typeof NEWS_CATEGORIES;
+
+export const NEWS_SOURCES = {
+  yle:       { label: 'YLE',       color: '#0047b3' },
+  iltalehti: { label: 'Iltalehti', color: '#e30613' },
+  mtv:       { label: 'MTV',       color: '#ff6900' },
+} as const;
+
+export type NewsSourceKey = keyof typeof NEWS_SOURCES;

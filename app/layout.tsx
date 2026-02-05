@@ -10,19 +10,20 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Tilannekuva.online - Suomen reaaliaikainen kartta',
+  title: 'Tilannetieto.fi - Suomen reaaliaikainen tilannekuva',
   description:
-    'Yhdistetty näkymä Suomen rikostilastoihin ja liikennetapahtumiin. Reaaliaikaiset tiedot Tilastokeskukselta ja Fintrafficilta.',
+    'Yhdistetty näkymä Suomen uutisiin, rikostilastoihin ja liikennetapahtumiin. Reaaliaikaiset tiedot YLE, IL, MTV, Tilastokeskus ja Fintraffic.',
   keywords: [
     'kartta',
     'liikenne',
     'rikostilastot',
+    'uutiset',
     'Suomi',
     'reaaliaikainen',
-    'tilannekuva',
+    'tilannetieto',
   ],
-  authors: [{ name: 'Tilannekuva.online' }],
-  creator: 'IMPERIUM AI',
+  authors: [{ name: 'Tilannetieto.fi' }],
+  creator: 'Foundation System',
 };
 
 export default function RootLayout({

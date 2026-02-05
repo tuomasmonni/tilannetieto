@@ -6,7 +6,7 @@ import {
   CRIME_CATEGORIES,
   AVAILABLE_YEARS,
 } from '@/lib/contexts/UnifiedFilterContext';
-import { EVENT_CATEGORIES, type EventCategory } from '@/lib/constants';
+import { EVENT_CATEGORIES, NEWS_CATEGORIES, NEWS_SOURCES, type EventCategory, type NewsCategoryKey, type NewsSourceKey } from '@/lib/constants';
 
 export default function FilterPanel() {
   const {
@@ -16,6 +16,7 @@ export default function FilterPanel() {
     transit,
     roadWeather,
     weatherCamera,
+    news,
     theme,
     setCrimeYear,
     toggleCrimeCategory,
@@ -30,9 +31,14 @@ export default function FilterPanel() {
     toggleTransitVehicleType,
     setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
+    setNewsLayerVisible,
+    setNewsTimeRange,
+    toggleNewsSource,
+    toggleNewsCategory,
+    setNewsSearchQuery,
   } = useUnifiedFilters();
 
-  const [expandedSection, setExpandedSection] = useState<string | null>('weatherCamera');
+  const [expandedSection, setExpandedSection] = useState<string | null>('news');
   const [crimeInfoExpanded, setCrimeInfoExpanded] = useState(false);
 
   const toggleSection = (section: string) => {
@@ -46,6 +52,7 @@ export default function FilterPanel() {
   const transitExpanded = expandedSection === 'transit';
   const trafficExpanded = expandedSection === 'traffic';
   const roadWeatherExpanded = expandedSection === 'roadWeather';
+  const newsExpanded = expandedSection === 'news';
 
   const isDark = theme === 'dark';
   const bgClass = isDark ? 'bg-zinc-900/95 border-zinc-700' : 'bg-white/95 border-zinc-200';
@@ -56,6 +63,128 @@ export default function FilterPanel() {
 
   return (
     <div className={`w-80 md:w-96 backdrop-blur-sm rounded-lg border shadow-xl overflow-hidden transition-colors max-h-[80vh] overflow-y-auto ${bgClass}`}>
+      {/* ========== SECTION 0: UUTISET ========== */}
+      <div className={`border-b ${isDark ? 'border-zinc-700' : 'border-zinc-200'}`}>
+        <div className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => toggleSection('news')}
+              className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} ${isDark ? 'hover:text-white' : 'hover:text-zinc-900'}`}
+            >
+              <span className="text-amber-400">&#128240;</span>
+              <span>UUTISET</span>
+              <span className={`transition-transform text-xs ml-auto ${newsExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
+            </button>
+
+            <button
+              onClick={() => setNewsLayerVisible(!news.layerVisible)}
+              className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                news.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600'
+              }`}
+            >
+              {news.layerVisible ? 'ON' : 'OFF'}
+            </button>
+          </div>
+
+          {newsExpanded && (
+            <div className="space-y-3 pt-2">
+              {/* Time range */}
+              <div>
+                <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Aikaikkuna</label>
+                <div className="grid grid-cols-5 gap-1 p-1 rounded bg-zinc-100 dark:bg-zinc-800">
+                  {([
+                    { value: '1h' as const, label: '1h' },
+                    { value: '6h' as const, label: '6h' },
+                    { value: '24h' as const, label: '24h' },
+                    { value: '7d' as const, label: '7pv' },
+                    { value: '30d' as const, label: '30pv' },
+                  ]).map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setNewsTimeRange(opt.value)}
+                      className={`px-1 py-1.5 text-xs font-medium rounded transition-all ${
+                        news.timeRange === opt.value
+                          ? 'bg-amber-600 text-white shadow-sm'
+                          : isDark ? 'text-zinc-400 hover:text-zinc-300' : 'text-zinc-600 hover:text-zinc-900'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Media sources */}
+              <div>
+                <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Media</label>
+                <div className="flex gap-2">
+                  {(Object.entries(NEWS_SOURCES) as [NewsSourceKey, typeof NEWS_SOURCES[NewsSourceKey]][]).map(([key, src]) => (
+                    <button
+                      key={key}
+                      onClick={() => toggleNewsSource(key)}
+                      className={`px-2 py-1 rounded text-xs font-medium transition-colors border ${
+                        news.sources.includes(key)
+                          ? 'border-amber-500 text-amber-400 bg-amber-500/10'
+                          : isDark ? 'border-zinc-700 text-zinc-500' : 'border-zinc-300 text-zinc-400'
+                      }`}
+                    >
+                      {src.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Categories */}
+              <div>
+                <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Kategoriat</label>
+                <div className="space-y-1 max-h-40 overflow-y-auto">
+                  {(Object.entries(NEWS_CATEGORIES) as [NewsCategoryKey, typeof NEWS_CATEGORIES[NewsCategoryKey]][]).map(([key, cat]) => (
+                    <label
+                      key={key}
+                      className={`flex items-center gap-2 p-1.5 rounded cursor-pointer transition-colors ${hoverBgClass}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={news.categories.includes(key)}
+                        onChange={() => toggleNewsCategory(key)}
+                        className="w-3.5 h-3.5 rounded accent-amber-600"
+                      />
+                      <span className="text-sm">{cat.emoji}</span>
+                      <span className={`text-xs flex-1 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                        {cat.label}
+                      </span>
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Search */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Hae uutisista..."
+                  value={news.searchQuery}
+                  onChange={(e) => setNewsSearchQuery(e.target.value)}
+                  className={`w-full px-3 py-1.5 rounded border text-xs focus:border-amber-500 focus:outline-none transition-colors ${selectBgClass}`}
+                />
+              </div>
+
+              <p className={`text-xs ${textMutedClass}`}>
+                {news.layerVisible
+                  ? 'YLE, Iltalehti, MTV uutiset kartalla (AI-analysoitu)'
+                  : 'Uutiskerros piilotettu'}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* ========== SECTION 1: KELIKAMERAT ========== */}
       <div className={`border-b ${isDark ? 'border-zinc-700' : 'border-zinc-200'}`}>
         <div className="p-4 space-y-3">
@@ -64,14 +193,14 @@ export default function FilterPanel() {
               onClick={() => toggleSection('weatherCamera')}
               className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} ${isDark ? 'hover:text-white' : 'hover:text-zinc-900'}`}
             >
-              <span>📷</span>
+              <span>&#128247;</span>
               <span>KELIKAMERAT</span>
               <span
                 className={`transition-transform text-xs ml-auto ${
                   weatherCameraExpanded ? 'rotate-180' : ''
                 }`}
               >
-                ▼
+                &#9660;
               </span>
             </button>
 
@@ -112,7 +241,7 @@ export default function FilterPanel() {
             >
               <span className="text-cyan-400">&#9730;</span>
               <span>SÄÄ</span>
-              <span className={`transition-transform text-xs ml-auto ${weatherExpanded ? 'rotate-180' : ''}`}>▼</span>
+              <span className={`transition-transform text-xs ml-auto ${weatherExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
             </button>
 
             <button
@@ -177,7 +306,7 @@ export default function FilterPanel() {
             >
               <span className="text-emerald-400">&#128652;</span>
               <span>JOUKKOLIIKENNE</span>
-              <span className={`transition-transform text-xs ml-auto ${transitExpanded ? 'rotate-180' : ''}`}>▼</span>
+              <span className={`transition-transform text-xs ml-auto ${transitExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
             </button>
 
             <button
@@ -198,10 +327,10 @@ export default function FilterPanel() {
                 <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Ajoneuvotyyppi</label>
                 <div className="space-y-1">
                   {([
-                    { type: 'bus' as const, label: 'Bussi', emoji: '🚌' },
-                    { type: 'tram' as const, label: 'Ratikka', emoji: '🚊' },
-                    { type: 'metro' as const, label: 'Metro', emoji: '🚇' },
-                    { type: 'train' as const, label: 'Lähijuna', emoji: '🚆' },
+                    { type: 'bus' as const, label: 'Bussi', emoji: '&#128652;' },
+                    { type: 'tram' as const, label: 'Ratikka', emoji: '&#128650;' },
+                    { type: 'metro' as const, label: 'Metro', emoji: '&#128647;' },
+                    { type: 'train' as const, label: 'Lähijuna', emoji: '&#128646;' },
                   ]).map(vt => (
                     <label
                       key={vt.type}
@@ -213,7 +342,7 @@ export default function FilterPanel() {
                         onChange={() => toggleTransitVehicleType(vt.type)}
                         className="w-4 h-4 rounded accent-emerald-600"
                       />
-                      <span>{vt.emoji}</span>
+                      <span dangerouslySetInnerHTML={{ __html: vt.emoji }} />
                       <span className={`text-sm flex-1 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
                         {vt.label}
                       </span>
@@ -241,7 +370,7 @@ export default function FilterPanel() {
             >
               <span className="text-violet-400">&#127777;</span>
               <span>TIESÄÄ</span>
-              <span className={`transition-transform text-xs ml-auto ${roadWeatherExpanded ? 'rotate-180' : ''}`}>▼</span>
+              <span className={`transition-transform text-xs ml-auto ${roadWeatherExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
             </button>
 
             <button
@@ -281,7 +410,7 @@ export default function FilterPanel() {
             >
               <span className="text-orange-400">&#9888;</span>
               <span>LIIKENNE</span>
-              <span className={`transition-transform text-xs ml-auto ${trafficExpanded ? 'rotate-180' : ''}`}>▼</span>
+              <span className={`transition-transform text-xs ml-auto ${trafficExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
             </button>
 
             <button
@@ -361,14 +490,14 @@ export default function FilterPanel() {
             onClick={() => toggleSection('crime')}
             className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} ${isDark ? 'hover:text-white' : 'hover:text-zinc-900'}`}
           >
-            <span>🔴</span>
+            <span>&#128308;</span>
             <span>RIKOSTILASTOT</span>
             <span
               className={`transition-transform text-xs ml-auto ${
                 crimeExpanded ? 'rotate-180' : ''
               }`}
             >
-              ▼
+              &#9660;
             </span>
           </button>
 
@@ -493,9 +622,9 @@ export default function FilterPanel() {
                 onClick={() => setCrimeInfoExpanded(!crimeInfoExpanded)}
                 className={`flex items-center gap-1.5 text-xs transition-colors ${textMutedClass} ${isDark ? 'hover:text-zinc-200' : 'hover:text-zinc-900'}`}
               >
-                <span>ℹ️</span>
+                <span>&#8505;&#65039;</span>
                 <span>Tietoa datasta</span>
-                <span className={`transition-transform ${crimeInfoExpanded ? 'rotate-180' : ''}`}>▼</span>
+                <span className={`transition-transform ${crimeInfoExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
               </button>
               {crimeInfoExpanded && (
                 <div className={`mt-2 p-3 rounded text-xs leading-relaxed space-y-2 ${isDark ? 'bg-zinc-800/80 text-zinc-400' : 'bg-zinc-50 text-zinc-600'}`}>

@@ -26,6 +26,10 @@
     "app/api/weathercam/route.ts": {
       "memory": 512,
       "maxDuration": 30
+    },
+    "app/api/news/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
     }
   }
 }
