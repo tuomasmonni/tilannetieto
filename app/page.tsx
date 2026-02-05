@@ -14,10 +14,32 @@ import Legend from '@/components/ui/Legend';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import MapContainer from '@/components/map/MapContainer';
 import CrimeLayer from '@/components/map/layers/CrimeLayer';
+import EventDetailCard from '@/components/ui/EventDetailCard';
+import type { EventDetails } from '@/lib/types';
 import dynamic from 'next/dynamic';
 
 const WeatherCameraLayer = dynamic(
   () => import('@/components/map/layers/WeatherCameraLayer'),
+  { ssr: false }
+);
+
+const TrafficLayer = dynamic(
+  () => import('@/components/map/layers/TrafficLayer'),
+  { ssr: false }
+);
+
+const WeatherLayer = dynamic(
+  () => import('@/components/map/layers/WeatherLayer'),
+  { ssr: false }
+);
+
+const TransitLayer = dynamic(
+  () => import('@/components/map/layers/TransitLayer'),
+  { ssr: false }
+);
+
+const RoadWeatherLayer = dynamic(
+  () => import('@/components/map/layers/RoadWeatherLayer'),
   { ssr: false }
 );
 
@@ -30,11 +52,16 @@ function AppContent() {
   const [map, setMap] = useState<MapboxMap | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventDetails | null>(null);
   const { theme } = useUnifiedFilters();
 
   const handleMapReady = useCallback((mapInstance: MapboxMap) => {
     setMap(mapInstance);
     setIsLoading(false);
+  }, []);
+
+  const handleEventSelect = useCallback((event: EventDetails | null) => {
+    setSelectedEvent(event);
   }, []);
 
   return (
@@ -65,7 +92,11 @@ function AppContent() {
         {map && (
           <>
             <CrimeLayer map={map} />
+            <TrafficLayer map={map} onEventSelect={handleEventSelect} />
             <WeatherCameraLayer map={map} />
+            <WeatherLayer map={map} onEventSelect={handleEventSelect} />
+            <TransitLayer map={map} onEventSelect={handleEventSelect} />
+            <RoadWeatherLayer map={map} onEventSelect={handleEventSelect} />
           </>
         )}
       </MapContainer>
@@ -79,6 +110,9 @@ function AppContent() {
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 md:hidden">
         <Legend />
       </div>
+
+      {/* Event Detail Card */}
+      <EventDetailCard event={selectedEvent} onClose={() => setSelectedEvent(null)} />
 
       {/* Weather Camera Modal */}
       <WeatherCameraModal />

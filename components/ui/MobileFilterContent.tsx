@@ -14,12 +14,20 @@ interface MobileFilterContentProps {
 export default function MobileFilterContent({ mode }: MobileFilterContentProps) {
   const {
     crime,
+    weather,
+    transit,
+    roadWeather,
     weatherCamera,
     theme,
     setCrimeYear,
     toggleCrimeCategory,
     setCrimeLayerVisible,
     setCrimeDisplayMode,
+    setWeatherLayerVisible,
+    setWeatherMetric,
+    setTransitLayerVisible,
+    toggleTransitVehicleType,
+    setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
   } = useUnifiedFilters();
 
@@ -33,6 +41,9 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
 
   const crimeExpanded = expandedSection === 'crime';
   const weatherCameraExpanded = expandedSection === 'weatherCamera';
+  const weatherExpanded = expandedSection === 'weather';
+  const transitExpanded = expandedSection === 'transit';
+  const roadWeatherExpanded = expandedSection === 'roadWeather';
 
   const isDark = theme === 'dark';
   const textClass = isDark ? 'text-zinc-200' : 'text-zinc-800';
@@ -76,6 +87,45 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
               `}
             >
               🔴 Rikostilastot
+            </button>
+            <button
+              onClick={() => setWeatherLayerVisible(!weather.layerVisible)}
+              className={`
+                px-4 py-2.5 rounded-lg text-sm font-medium
+                transition-colors min-h-[44px]
+                ${weather.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+                }
+              `}
+            >
+              &#9730; Sää
+            </button>
+            <button
+              onClick={() => setTransitLayerVisible(!transit.layerVisible)}
+              className={`
+                px-4 py-2.5 rounded-lg text-sm font-medium
+                transition-colors min-h-[44px]
+                ${transit.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+                }
+              `}
+            >
+              &#128652; Liikenne
+            </button>
+            <button
+              onClick={() => setRoadWeatherLayerVisible(!roadWeather.layerVisible)}
+              className={`
+                px-4 py-2.5 rounded-lg text-sm font-medium
+                transition-colors min-h-[44px]
+                ${roadWeather.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+                }
+              `}
+            >
+              &#127777; Tiesää
             </button>
           </div>
         </div>
@@ -128,6 +178,175 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
             </p>
             <p className={`text-xs ${textMutedClass} italic`}>
               Klikkaa kamera-ikonia kartalla nähdäksesi kuvat
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ========== SÄÄ ========== */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => toggleSection('weather')}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} min-h-[44px]`}
+          >
+            <span className="text-cyan-400">&#9730;</span>
+            <span>SÄÄ</span>
+            <span className={`transition-transform text-xs ml-auto ${weatherExpanded ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+          <button
+            onClick={() => setWeatherLayerVisible(!weather.layerVisible)}
+            className={`
+              px-3 py-1.5 rounded text-xs font-medium
+              transition-colors min-h-[44px] min-w-[60px]
+              ${weather.layerVisible
+                ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+              }
+            `}
+          >
+            {weather.layerVisible ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        {weatherExpanded && (
+          <div className="space-y-3 pt-2">
+            <div>
+              <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Metriikka</label>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { value: 'temperature' as const, label: 'Lämpö' },
+                  { value: 'wind' as const, label: 'Tuuli' },
+                  { value: 'precipitation' as const, label: 'Sade' },
+                ]).map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setWeatherMetric(opt.value)}
+                    className={`
+                      px-3 py-2.5 text-sm font-medium rounded-lg
+                      transition-colors min-h-[44px]
+                      ${weather.metric === opt.value
+                        ? 'bg-cyan-600 text-white'
+                        : buttonBgClass
+                      }
+                    `}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className={`text-sm ${textMutedClass}`}>
+              {weather.layerVisible
+                ? 'FMI sääasemat kartalla'
+                : 'Sääkerros piilotettu'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ========== JOUKKOLIIKENNE ========== */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => toggleSection('transit')}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} min-h-[44px]`}
+          >
+            <span className="text-emerald-400">&#128652;</span>
+            <span>JOUKKOLIIKENNE</span>
+            <span className={`transition-transform text-xs ml-auto ${transitExpanded ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+          <button
+            onClick={() => setTransitLayerVisible(!transit.layerVisible)}
+            className={`
+              px-3 py-1.5 rounded text-xs font-medium
+              transition-colors min-h-[44px] min-w-[60px]
+              ${transit.layerVisible
+                ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+              }
+            `}
+          >
+            {transit.layerVisible ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        {transitExpanded && (
+          <div className="space-y-3 pt-2">
+            <div>
+              <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Ajoneuvotyyppi</label>
+              <div className="space-y-1.5">
+                {([
+                  { type: 'bus' as const, label: 'Bussi', emoji: '🚌' },
+                  { type: 'tram' as const, label: 'Ratikka', emoji: '🚊' },
+                  { type: 'metro' as const, label: 'Metro', emoji: '🚇' },
+                  { type: 'train' as const, label: 'Lähijuna', emoji: '🚆' },
+                ]).map(vt => (
+                  <label
+                    key={vt.type}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-lg cursor-pointer
+                      transition-colors min-h-[48px] ${hoverBgClass}
+                    `}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={transit.vehicleTypes.includes(vt.type)}
+                      onChange={() => toggleTransitVehicleType(vt.type)}
+                      className="w-6 h-6 rounded accent-emerald-600 flex-shrink-0"
+                    />
+                    <span className="text-lg">{vt.emoji}</span>
+                    <span className={`text-sm flex-1 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                      {vt.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <p className={`text-sm ${textMutedClass}`}>
+              {transit.layerVisible
+                ? 'HSL-alueen joukkoliikenne (15s päivitys)'
+                : 'Joukkoliikennekerros piilotettu'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ========== TIESÄÄ ========== */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => toggleSection('roadWeather')}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} min-h-[44px]`}
+          >
+            <span className="text-violet-400">&#127777;</span>
+            <span>TIESÄÄ</span>
+            <span className={`transition-transform text-xs ml-auto ${roadWeatherExpanded ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+          <button
+            onClick={() => setRoadWeatherLayerVisible(!roadWeather.layerVisible)}
+            className={`
+              px-3 py-1.5 rounded text-xs font-medium
+              transition-colors min-h-[44px] min-w-[60px]
+              ${roadWeather.layerVisible
+                ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+              }
+            `}
+          >
+            {roadWeather.layerVisible ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        {roadWeatherExpanded && (
+          <div className="space-y-3 pt-2">
+            <p className={`text-sm ${textMutedClass}`}>
+              {roadWeather.layerVisible
+                ? '~500 tiesääasemaa kartalla'
+                : 'Tiesääkerros piilotettu'}
+            </p>
+            <p className={`text-xs ${textMutedClass} italic`}>
+              Korkean vakavuuden kohteet (jää, huono näkyvyys) korostettu
             </p>
           </div>
         )}
