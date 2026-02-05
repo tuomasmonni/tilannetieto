@@ -281,26 +281,38 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
     fetchDataRef.current(traffic?.timeRange || 'all');
   }, [map, traffic?.timeRange, traffic?.layerVisible]);
 
-  // Update map when data or filters change
+  // Combined visibility + data filter effect
+  // Single effect ensures clusters always update atomically
   useEffect(() => {
-    if (!map || !allData || !layersReady) return;
-    const filtered = filterByCategory(allData, traffic?.categories || []);
+    if (!map || !layersReady) return;
+
+    const vis = traffic?.layerVisible ? 'visible' : 'none';
+    const layerIds = [
+      'traffic-events-clusters',
+      'traffic-events-cluster-count',
+      'traffic-events-icons',
+      'traffic-events-pulse',
+    ];
+
+    for (const id of layerIds) {
+      if (map.getLayer(id)) {
+        map.setLayoutProperty(id, 'visibility', vis);
+      }
+    }
+
     const source = map.getSource('traffic-events');
     if (source && 'setData' in source) {
-      console.log(`[TrafficLayer] Filter effect: ${filtered.features.length} events on map`);
-      source.setData(filtered);
+      if (!traffic?.layerVisible || !allData) {
+        // Layer hidden or no data → empty source so clusters disappear
+        source.setData({ type: 'FeatureCollection', features: [] });
+      } else {
+        // Layer visible → set filtered data
+        const filtered = filterByCategory(allData, traffic?.categories || []);
+        console.log(`[TrafficLayer] Update: ${filtered.features.length} filtered events, visible=${traffic?.layerVisible}`);
+        source.setData(filtered);
+      }
     }
-  }, [map, allData, traffic?.categories, layersReady]);
-
-  // Visibility
-  useEffect(() => {
-    if (!map || !layersReady || !map.getLayer('traffic-events-icons')) return;
-    const vis = traffic?.layerVisible ? 'visible' : 'none';
-    map.setLayoutProperty('traffic-events-icons', 'visibility', vis);
-    map.setLayoutProperty('traffic-events-pulse', 'visibility', vis);
-    map.setLayoutProperty('traffic-events-clusters', 'visibility', vis);
-    map.setLayoutProperty('traffic-events-cluster-count', 'visibility', vis);
-  }, [map, traffic?.layerVisible, layersReady]);
+  }, [map, layersReady, allData, traffic?.layerVisible, traffic?.categories]);
 
   return null;
 }
