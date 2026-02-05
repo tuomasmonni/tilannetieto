@@ -6,6 +6,7 @@ import {
   CRIME_CATEGORIES,
   AVAILABLE_YEARS,
 } from '@/lib/contexts/UnifiedFilterContext';
+import { EVENT_CATEGORIES, type EventCategory } from '@/lib/constants';
 
 interface MobileFilterContentProps {
   mode: 'compact' | 'expanded';
@@ -14,6 +15,7 @@ interface MobileFilterContentProps {
 export default function MobileFilterContent({ mode }: MobileFilterContentProps) {
   const {
     crime,
+    traffic,
     weather,
     transit,
     roadWeather,
@@ -23,6 +25,9 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
     toggleCrimeCategory,
     setCrimeLayerVisible,
     setCrimeDisplayMode,
+    setTrafficLayerVisible,
+    setTrafficTimeRange,
+    toggleTrafficCategory,
     setWeatherLayerVisible,
     setWeatherMetric,
     setTransitLayerVisible,
@@ -43,6 +48,7 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
   const weatherCameraExpanded = expandedSection === 'weatherCamera';
   const weatherExpanded = expandedSection === 'weather';
   const transitExpanded = expandedSection === 'transit';
+  const trafficExpanded = expandedSection === 'traffic';
   const roadWeatherExpanded = expandedSection === 'roadWeather';
 
   const isDark = theme === 'dark';
@@ -112,7 +118,20 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
                 }
               `}
             >
-              &#128652; Liikenne
+              &#128652; Joukkoliik.
+            </button>
+            <button
+              onClick={() => setTrafficLayerVisible(!traffic.layerVisible)}
+              className={`
+                px-4 py-2.5 rounded-lg text-sm font-medium
+                transition-colors min-h-[44px]
+                ${traffic.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+                }
+              `}
+            >
+              &#9888; Liikenne
             </button>
             <button
               onClick={() => setRoadWeatherLayerVisible(!roadWeather.layerVisible)}
@@ -347,6 +366,95 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
             </p>
             <p className={`text-xs ${textMutedClass} italic`}>
               Korkean vakavuuden kohteet (jää, huono näkyvyys) korostettu
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ========== LIIKENNE ========== */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => toggleSection('traffic')}
+            className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} min-h-[44px]`}
+          >
+            <span className="text-orange-400">&#9888;</span>
+            <span>LIIKENNE</span>
+            <span className={`transition-transform text-xs ml-auto ${trafficExpanded ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+          <button
+            onClick={() => setTrafficLayerVisible(!traffic.layerVisible)}
+            className={`
+              px-3 py-1.5 rounded text-xs font-medium
+              transition-colors min-h-[44px] min-w-[60px]
+              ${traffic.layerVisible
+                ? 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600 active:bg-zinc-500'
+              }
+            `}
+          >
+            {traffic.layerVisible ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        {trafficExpanded && (
+          <div className="space-y-3 pt-2">
+            <div>
+              <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Aikaikkuna</label>
+              <div className="grid grid-cols-5 gap-2">
+                {([
+                  { value: '2h' as const, label: '2h' },
+                  { value: '8h' as const, label: '8h' },
+                  { value: '24h' as const, label: '24h' },
+                  { value: '7d' as const, label: '7pv' },
+                  { value: 'all' as const, label: 'Kaikki' },
+                ]).map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setTrafficTimeRange(opt.value)}
+                    className={`
+                      px-2 py-2.5 text-sm font-medium rounded-lg
+                      transition-colors min-h-[44px]
+                      ${traffic.timeRange === opt.value
+                        ? 'bg-orange-600 text-white'
+                        : isDark ? 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' : 'bg-zinc-200 text-zinc-600 hover:bg-zinc-300'
+                      }
+                    `}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Kategoriat</label>
+              <div className="space-y-1.5">
+                {(['accident', 'disruption', 'roadwork', 'weather'] as EventCategory[]).map(cat => (
+                  <label
+                    key={cat}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-lg cursor-pointer
+                      transition-colors min-h-[48px] ${hoverBgClass}
+                    `}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={traffic.categories.includes(cat)}
+                      onChange={() => toggleTrafficCategory(cat)}
+                      className="w-6 h-6 rounded accent-orange-600 flex-shrink-0"
+                    />
+                    <span className="text-lg">{EVENT_CATEGORIES[cat].emoji}</span>
+                    <span className={`text-sm flex-1 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                      {EVENT_CATEGORIES[cat].label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <p className={`text-sm ${textMutedClass}`}>
+              {traffic.layerVisible
+                ? 'Fintraffic liikenneilmoitukset kartalla'
+                : 'Liikennekerros piilotettu'}
             </p>
           </div>
         )}

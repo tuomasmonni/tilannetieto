@@ -6,10 +6,12 @@ import {
   CRIME_CATEGORIES,
   AVAILABLE_YEARS,
 } from '@/lib/contexts/UnifiedFilterContext';
+import { EVENT_CATEGORIES, type EventCategory } from '@/lib/constants';
 
 export default function FilterPanel() {
   const {
     crime,
+    traffic,
     weather,
     transit,
     roadWeather,
@@ -19,6 +21,9 @@ export default function FilterPanel() {
     toggleCrimeCategory,
     setCrimeLayerVisible,
     setCrimeDisplayMode,
+    setTrafficLayerVisible,
+    setTrafficTimeRange,
+    toggleTrafficCategory,
     setWeatherLayerVisible,
     setWeatherMetric,
     setTransitLayerVisible,
@@ -39,6 +44,7 @@ export default function FilterPanel() {
   const weatherCameraExpanded = expandedSection === 'weatherCamera';
   const weatherExpanded = expandedSection === 'weather';
   const transitExpanded = expandedSection === 'transit';
+  const trafficExpanded = expandedSection === 'traffic';
   const roadWeatherExpanded = expandedSection === 'roadWeather';
 
   const isDark = theme === 'dark';
@@ -265,7 +271,90 @@ export default function FilterPanel() {
         </div>
       </div>
 
-      {/* ========== SECTION 5: RIKOSTILASTOT ========== */}
+      {/* ========== SECTION 5: LIIKENNE ========== */}
+      <div className={`border-b ${isDark ? 'border-zinc-700' : 'border-zinc-200'}`}>
+        <div className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => toggleSection('traffic')}
+              className={`flex items-center gap-2 text-sm font-semibold transition-colors ${textClass} ${isDark ? 'hover:text-white' : 'hover:text-zinc-900'}`}
+            >
+              <span className="text-orange-400">&#9888;</span>
+              <span>LIIKENNE</span>
+              <span className={`transition-transform text-xs ml-auto ${trafficExpanded ? 'rotate-180' : ''}`}>▼</span>
+            </button>
+
+            <button
+              onClick={() => setTrafficLayerVisible(!traffic.layerVisible)}
+              className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                traffic.layerVisible
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600'
+              }`}
+            >
+              {traffic.layerVisible ? 'ON' : 'OFF'}
+            </button>
+          </div>
+
+          {trafficExpanded && (
+            <div className="space-y-3 pt-2">
+              <div>
+                <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Aikaikkuna</label>
+                <div className="grid grid-cols-5 gap-1 p-1 rounded bg-zinc-100 dark:bg-zinc-800">
+                  {([
+                    { value: '2h' as const, label: '2h' },
+                    { value: '8h' as const, label: '8h' },
+                    { value: '24h' as const, label: '24h' },
+                    { value: '7d' as const, label: '7pv' },
+                    { value: 'all' as const, label: 'Kaikki' },
+                  ]).map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setTrafficTimeRange(opt.value)}
+                      className={`px-1 py-1.5 text-xs font-medium rounded transition-all ${
+                        traffic.timeRange === opt.value
+                          ? 'bg-orange-600 text-white shadow-sm'
+                          : isDark ? 'text-zinc-400 hover:text-zinc-300' : 'text-zinc-600 hover:text-zinc-900'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className={`text-xs ${textMutedClass} mb-2 block font-medium`}>Kategoriat</label>
+                <div className="space-y-1">
+                  {(['accident', 'disruption', 'roadwork', 'weather'] as EventCategory[]).map(cat => (
+                    <label
+                      key={cat}
+                      className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${hoverBgClass}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={traffic.categories.includes(cat)}
+                        onChange={() => toggleTrafficCategory(cat)}
+                        className="w-4 h-4 rounded accent-orange-600"
+                      />
+                      <span>{EVENT_CATEGORIES[cat].emoji}</span>
+                      <span className={`text-sm flex-1 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                        {EVENT_CATEGORIES[cat].label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <p className={`text-xs ${textMutedClass}`}>
+                {traffic.layerVisible
+                  ? 'Fintraffic liikenneilmoitukset kartalla'
+                  : 'Liikennekerros piilotettu'}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ========== SECTION 6: RIKOSTILASTOT ========== */}
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <button

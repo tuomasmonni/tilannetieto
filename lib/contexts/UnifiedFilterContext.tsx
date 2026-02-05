@@ -119,7 +119,7 @@ const DEFAULT_STATE: UnifiedFilterState = {
   traffic: {
     timeRange: 'all',
     categories: ['accident', 'disruption', 'roadwork', 'weather'],
-    layerVisible: true,
+    layerVisible: false,
   },
   weather: {
     layerVisible: false,
@@ -209,12 +209,25 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     });
   }, []);
 
-  const setCrimeLayerVisible = useCallback((visible: boolean) => {
-    setState(prev => ({
+  // Helper: sammuta kaikki muut layerit kun yksi aktivoidaan
+  const turnOffOtherLayers = useCallback((activeLayer: string) => {
+    return (prev: UnifiedFilterState): UnifiedFilterState => ({
       ...prev,
-      crime: { ...prev.crime, layerVisible: visible },
-    }));
+      crime: { ...prev.crime, layerVisible: activeLayer === 'crime' },
+      traffic: { ...prev.traffic, layerVisible: activeLayer === 'traffic' },
+      weather: { ...prev.weather, layerVisible: activeLayer === 'weather' },
+      transit: { ...prev.transit, layerVisible: activeLayer === 'transit' },
+      roadWeather: { ...prev.roadWeather, layerVisible: activeLayer === 'roadWeather' },
+      weatherCamera: { ...prev.weatherCamera, layerVisible: activeLayer === 'weatherCamera' },
+    });
   }, []);
+
+  const setCrimeLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => visible ? turnOffOtherLayers('crime')(prev) : ({
+      ...prev,
+      crime: { ...prev.crime, layerVisible: false },
+    }));
+  }, [turnOffOtherLayers]);
 
   const setCrimeLoading = useCallback((loading: boolean) => {
     setState(prev => ({
@@ -253,20 +266,20 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   }, []);
 
   const setTrafficLayerVisible = useCallback((visible: boolean) => {
-    setState(prev => ({
+    setState(prev => visible ? turnOffOtherLayers('traffic')(prev) : ({
       ...prev,
-      traffic: { ...prev.traffic, layerVisible: visible },
+      traffic: { ...prev.traffic, layerVisible: false },
     }));
-  }, []);
+  }, [turnOffOtherLayers]);
 
   // ========== WEATHER ACTIONS ==========
 
   const setWeatherLayerVisible = useCallback((visible: boolean) => {
-    setState(prev => ({
+    setState(prev => visible ? turnOffOtherLayers('weather')(prev) : ({
       ...prev,
-      weather: { ...prev.weather, layerVisible: visible },
+      weather: { ...prev.weather, layerVisible: false },
     }));
-  }, []);
+  }, [turnOffOtherLayers]);
 
   const setWeatherMetric = useCallback((metric: WeatherMetric) => {
     setState(prev => ({
@@ -278,11 +291,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== TRANSIT ACTIONS ==========
 
   const setTransitLayerVisible = useCallback((visible: boolean) => {
-    setState(prev => ({
+    setState(prev => visible ? turnOffOtherLayers('transit')(prev) : ({
       ...prev,
-      transit: { ...prev.transit, layerVisible: visible },
+      transit: { ...prev.transit, layerVisible: false },
     }));
-  }, []);
+  }, [turnOffOtherLayers]);
 
   const toggleTransitVehicleType = useCallback((type: TransitVehicleType) => {
     setState(prev => {
@@ -300,20 +313,20 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== ROAD WEATHER ACTIONS ==========
 
   const setRoadWeatherLayerVisible = useCallback((visible: boolean) => {
-    setState(prev => ({
+    setState(prev => visible ? turnOffOtherLayers('roadWeather')(prev) : ({
       ...prev,
-      roadWeather: { ...prev.roadWeather, layerVisible: visible },
+      roadWeather: { ...prev.roadWeather, layerVisible: false },
     }));
-  }, []);
+  }, [turnOffOtherLayers]);
 
   // ========== WEATHER CAMERA ACTIONS ==========
 
   const setWeatherCameraLayerVisible = useCallback((visible: boolean) => {
-    setState(prev => ({
+    setState(prev => visible ? turnOffOtherLayers('weatherCamera')(prev) : ({
       ...prev,
-      weatherCamera: { ...prev.weatherCamera, layerVisible: visible },
+      weatherCamera: { ...prev.weatherCamera, layerVisible: false },
     }));
-  }, []);
+  }, [turnOffOtherLayers]);
 
   const setSelectedWeatherCamera = useCallback((stationId: string | null) => {
     setState(prev => ({
