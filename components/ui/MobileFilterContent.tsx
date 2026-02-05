@@ -24,6 +24,7 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
   } = useUnifiedFilters();
 
   const [crimeExpanded, setCrimeExpanded] = useState(false);
+  const [crimeInfoExpanded, setCrimeInfoExpanded] = useState(false);
   const [weatherCameraExpanded, setWeatherCameraExpanded] = useState(true);
 
   const isDark = theme === 'dark';
@@ -248,6 +249,42 @@ export default function MobileFilterContent({ mode }: MobileFilterContentProps) 
                   </label>
                 ))}
               </div>
+            </div>
+
+            {/* Data info */}
+            <div className={`border-t pt-3 ${isDark ? 'border-zinc-700' : 'border-zinc-200'}`}>
+              <button
+                onClick={() => setCrimeInfoExpanded(!crimeInfoExpanded)}
+                className={`flex items-center gap-1.5 text-xs transition-colors min-h-[44px] ${textMutedClass} ${isDark ? 'hover:text-zinc-200' : 'hover:text-zinc-900'}`}
+              >
+                <span>ℹ️</span>
+                <span>Tietoa datasta</span>
+                <span className={`transition-transform ${crimeInfoExpanded ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {crimeInfoExpanded && (
+                <div className={`mt-2 p-3 rounded text-xs leading-relaxed space-y-2 ${isDark ? 'bg-zinc-800/80 text-zinc-400' : 'bg-zinc-50 text-zinc-600'}`}>
+                  <p>
+                    <span className="font-semibold">Lähde:</span>{' '}
+                    <a href="https://pxdata.stat.fi/PXWeb/pxweb/fi/StatFin/StatFin__rpk/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-400">Tilastokeskus</a>
+                    {' '}&ndash; Rikos- ja pakkokeinotilasto (ICCS)
+                  </p>
+                  <p>
+                    <span className="font-semibold">Väkiluku:</span>{' '}
+                    Tilastokeskuksen väestörakenne, kunnan väkiluku 31.12. valitulta vuodelta.
+                  </p>
+                  <p>
+                    <span className="font-semibold">Per 100k laskenta:</span>{' '}
+                    rikokset &divide; väkiluku &times; 100&nbsp;000
+                  </p>
+                  <p>
+                    <span className="font-semibold">ICCS-luokitus:</span>{' '}
+                    YK:n kansainvälinen rikosluokitus (teonkuvauspohjainen, ei lakipykäläpohjainen).
+                  </p>
+                  <p className={isDark ? 'text-zinc-500' : 'text-zinc-500'}>
+                    Data päivitetty: 03.02.2026
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
