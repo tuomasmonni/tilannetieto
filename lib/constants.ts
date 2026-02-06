@@ -177,9 +177,14 @@ export const NEWS_CATEGORIES = {
 export type NewsCategoryKey = keyof typeof NEWS_CATEGORIES;
 
 export const NEWS_SOURCES = {
-  yle:       { label: 'YLE',       color: '#0047b3' },
-  iltalehti: { label: 'Iltalehti', color: '#e30613' },
-  mtv:       { label: 'MTV',       color: '#ff6900' },
+  yle:                  { label: 'YLE',                   shortLabel: 'YLE',  color: '#0047b3' },
+  iltalehti:            { label: 'Iltalehti',             shortLabel: 'IL',   color: '#e30613' },
+  mtv:                  { label: 'MTV',                   shortLabel: 'MTV',  color: '#ff6900' },
+  hs:                   { label: 'Helsingin Sanomat',     shortLabel: 'HS',   color: '#f0563e' },
+  is:                   { label: 'Ilta-Sanomat',          shortLabel: 'IS',   color: '#ed1c24' },
+  kauppalehti:          { label: 'Kauppalehti',           shortLabel: 'KL',   color: '#006db6' },
+  maaseuduntulevaisuus: { label: 'Maaseudun Tulevaisuus', shortLabel: 'MT',   color: '#2d8b2d' },
+  suomenkuvalehti:      { label: 'Suomen Kuvalehti',      shortLabel: 'SK',   color: '#1a1a1a' },
 } as const;
 
 export type NewsSourceKey = keyof typeof NEWS_SOURCES;
@@ -251,7 +256,7 @@ export const LAYER_INFO: Record<LayerKey, { label: string; icon: string; descrip
   traffic: { label: 'Tapahtumat', icon: '⚠️', description: 'Fintraffic-ilmoitukset' },
   transit: { label: 'Joukkoliikenne', icon: '🚌', description: 'HSL-alueen liikenne' },
   crime: { label: 'Rikostilastot', icon: '📈', description: 'Tilastokeskus ICCS' },
-  news: { label: 'Uutiset', icon: '📰', description: 'YLE, IL, MTV' },
+  news: { label: 'Uutiset', icon: '📰', description: '8 mediaa, AI-ryhmittely' },
   train: { label: 'Junat', icon: '🚆', description: 'Reaaliaikaiset junasijainnit' },
   snow: { label: 'Lumitilanne', icon: '❄️', description: 'FMI lumensyvyys' },
   ice: { label: 'Jäänpaksuus', icon: '🧊', description: 'SYKE järvet + FMI merijää' },

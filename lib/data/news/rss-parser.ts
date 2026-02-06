@@ -1,5 +1,5 @@
 /**
- * RSS Feed Parser - YLE, Iltalehti, MTV
+ * RSS Feed Parser - 8 suomalaista mediaa
  */
 
 import { parseStringPromise } from 'xml2js';
@@ -9,6 +9,11 @@ const RSS_FEEDS: Record<NewsSource, string> = {
   yle: 'https://feeds.yle.fi/uutiset/v1/recent.rss?publisherIds=YLE_UUTISET',
   iltalehti: 'https://www.iltalehti.fi/rss.xml',
   mtv: 'https://www.mtvuutiset.fi/api/feed/rss/uutiset',
+  hs: 'https://www.hs.fi/rss/tuoreimmat.xml',
+  is: 'https://www.is.fi/rss/tuoreimmat.xml',
+  kauppalehti: 'https://www.kauppalehti.fi/rss',
+  maaseuduntulevaisuus: 'https://www.maaseuduntulevaisuus.fi/feed',
+  suomenkuvalehti: 'https://suomenkuvalehti.fi/feed-uusimmat/',
 };
 
 function stripHtml(html: string): string {
@@ -54,7 +59,7 @@ async function fetchFeed(source: NewsSource): Promise<ParsedFeedItem[]> {
       ? channel.item
       : [channel.item];
 
-    return items.slice(0, 50).map((item) => {
+    return items.slice(0, 30).map((item) => {
       const summary =
         stripHtml(item.description || item['content:encoded'] || '').slice(
           0,
@@ -83,8 +88,9 @@ async function fetchFeed(source: NewsSource): Promise<ParsedFeedItem[]> {
 }
 
 export async function fetchAllFeeds(): Promise<ParsedFeedItem[]> {
+  const sources = Object.keys(RSS_FEEDS) as NewsSource[];
   const results = await Promise.allSettled(
-    (['yle', 'iltalehti', 'mtv'] as NewsSource[]).map((s) => fetchFeed(s))
+    sources.map((s) => fetchFeed(s))
   );
 
   const allItems: ParsedFeedItem[] = [];

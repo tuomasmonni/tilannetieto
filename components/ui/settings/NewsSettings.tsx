@@ -44,7 +44,7 @@ export default function NewsSettings() {
         <label className={`text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Media
         </label>
-        <div className="flex gap-2 mt-1">
+        <div className="flex flex-wrap gap-1.5 mt-1">
           {(Object.entries(NEWS_SOURCES) as [NewsSourceKey, typeof NEWS_SOURCES[NewsSourceKey]][]).map(([key, src]) => (
             <button
               key={key}
@@ -55,7 +55,7 @@ export default function NewsSettings() {
                   : isDark ? 'border-zinc-700 text-zinc-500' : 'border-zinc-300 text-zinc-400'
               }`}
             >
-              {src.label}
+              {src.shortLabel}
             </button>
           ))}
         </div>

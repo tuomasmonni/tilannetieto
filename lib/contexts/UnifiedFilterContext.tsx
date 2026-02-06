@@ -287,7 +287,7 @@ const DEFAULT_STATE: UnifiedFilterState = {
   news: {
     layerVisible: false,
     timeRange: '24h',
-    sources: ['yle', 'iltalehti', 'mtv'],
+    sources: ['yle', 'iltalehti', 'mtv', 'hs', 'is', 'kauppalehti', 'maaseuduntulevaisuus', 'suomenkuvalehti'],
     categories: ['liikenne', 'rikos', 'politiikka', 'terveys', 'ymparisto', 'talous', 'urheilu', 'onnettomuus', 'muu'],
     searchQuery: '',
   },

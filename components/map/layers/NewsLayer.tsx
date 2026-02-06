@@ -30,6 +30,12 @@ interface NewsGeoJSON {
       severity: string;
       confidence: number;
       locationName: string;
+      isCluster?: boolean;
+      sourceCount?: number;
+      allSources?: string;
+      mergedSummary?: string;
+      articleCount?: number;
+      articleUrls?: string;
     };
   }>;
   metadata?: {
@@ -140,15 +146,22 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
           },
           paint: {
             'circle-radius': [
-              'interpolate', ['linear'], ['zoom'],
-              4, 5, 8, 7, 12, 9,
+              'case',
+              ['>', ['coalesce', ['get', 'sourceCount'], 1], 1],
+              ['interpolate', ['linear'], ['zoom'], 4, 8, 8, 11, 12, 14],
+              ['interpolate', ['linear'], ['zoom'], 4, 5, 8, 7, 12, 9],
             ],
             'circle-color': [
               'match', ['get', 'category'],
               ...Object.entries(CATEGORY_COLORS).flatMap(([k, v]) => [k, v]),
               '#6b7280', // default
             ],
-            'circle-stroke-width': 2,
+            'circle-stroke-width': [
+              'case',
+              ['>', ['coalesce', ['get', 'sourceCount'], 1], 1],
+              3,
+              2,
+            ],
             'circle-stroke-color': '#ffffff',
             'circle-opacity': 0.9,
           },
@@ -249,20 +262,37 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
         yle: 'YLE Uutiset',
         iltalehti: 'Iltalehti',
         mtv: 'MTV Uutiset',
+        hs: 'Helsingin Sanomat',
+        is: 'Ilta-Sanomat',
+        kauppalehti: 'Kauppalehti',
+        maaseuduntulevaisuus: 'Maaseudun Tulevaisuus',
+        suomenkuvalehti: 'Suomen Kuvalehti',
       };
+
+      const isNewsCluster = props.isCluster && props.sourceCount > 1;
+      const sourceDisplay = isNewsCluster
+        ? `Raportoitu ${props.sourceCount} lähteessä`
+        : sourceLabels[props.source] || props.source;
 
       onEventSelect?.({
         id: props.id,
         type: 'news',
         category: props.category as any,
         title: props.title,
-        description: props.description || '',
+        description: props.mergedSummary || props.description || '',
         locationName: props.locationName || props.municipality || 'Suomi',
         municipality: props.municipality,
         timestamp: props.timestamp,
         severity: props.severity as 'low' | 'medium' | 'high',
-        source: sourceLabels[props.source] || props.source,
-        metadata: { sourceUrl: props.sourceUrl },
+        source: sourceDisplay,
+        metadata: {
+          sourceUrl: props.sourceUrl,
+          isCluster: props.isCluster,
+          sourceCount: props.sourceCount,
+          allSources: props.allSources,
+          articleCount: props.articleCount,
+          articleUrls: props.articleUrls,
+        },
         screenPosition: { x: e.point.x, y: e.point.y },
       });
     };

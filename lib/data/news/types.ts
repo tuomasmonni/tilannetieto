@@ -2,7 +2,7 @@
  * Uutisvalvonta - Tyypit
  */
 
-export type NewsSource = 'yle' | 'iltalehti' | 'mtv';
+export type NewsSource = 'yle' | 'iltalehti' | 'mtv' | 'hs' | 'is' | 'kauppalehti' | 'maaseuduntulevaisuus' | 'suomenkuvalehti';
 
 export type NewsCategory =
   | 'liikenne'
@@ -53,6 +53,22 @@ export interface NewsArticle {
   municipality: string | null;
   lat: number | null;
   lng: number | null;
+  severity: 'low' | 'medium' | 'high';
+  confidence: number;
+  locationName: string;
+}
+
+
+export interface NewsEvent {
+  id: string;
+  primaryArticle: NewsArticle;
+  articles: NewsArticle[];
+  sources: NewsSource[];
+  mergedSummary: string;
+  municipality: string | null;
+  lat: number | null;
+  lng: number | null;
+  categories: NewsCategory[];
   severity: 'low' | 'medium' | 'high';
   confidence: number;
   locationName: string;

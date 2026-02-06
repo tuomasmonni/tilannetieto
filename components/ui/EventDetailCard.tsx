@@ -208,12 +208,61 @@ export default function EventDetailCard({ event, onClose }: EventDetailCardProps
               </div>
             </div>
           </div>
+
+          {/* Cluster sources */}
+          {Boolean(event.metadata?.isCluster) && Number(event.metadata?.sourceCount || 0) > 1 && (() => {
+            const meta = event.metadata as Record<string, unknown>;
+            const srcCount = Number(meta.sourceCount);
+            const sourceLabels: Record<string, string> = {
+              yle: 'YLE', iltalehti: 'IL', mtv: 'MTV', hs: 'HS', is: 'IS',
+              kauppalehti: 'KL', maaseuduntulevaisuus: 'MT', suomenkuvalehti: 'SK',
+            };
+            let articles: Array<{ source: string; title: string; url: string }> = [];
+            try {
+              articles = JSON.parse(String(meta.articleUrls || '[]'));
+            } catch { /* ignore */ }
+
+            return (
+              <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2.5">
+                <p className="text-xs font-medium text-amber-400 mb-1.5">
+                  {`Raportoitu ${srcCount} lähteessä`}
+                </p>
+                <div className="space-y-1">
+                  {articles.map((a: { source: string; title: string; url: string }, i: number) => (
+                    <a
+                      key={i}
+                      href={a.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-xs text-zinc-300 hover:text-amber-300 transition-colors"
+                    >
+                      <span className="font-medium text-amber-500 w-6 flex-shrink-0">
+                        {sourceLabels[a.source] || a.source}
+                      </span>
+                      <span className="truncate">{a.title}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Footer */}
         <div className="px-4 py-2 border-t border-zinc-800 bg-zinc-900/80">
           <div className="flex items-center justify-between text-[10px] text-zinc-500">
-            <span>{event.source}</span>
+            {event.metadata?.sourceUrl ? (
+              <a
+                href={String(event.metadata.sourceUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-500 hover:text-amber-400 transition-colors"
+              >
+                {event.source}
+              </a>
+            ) : (
+              <span>{event.source}</span>
+            )}
             <span className={`px-1.5 py-0.5 rounded ${severityInfo.color}/20 ${severityInfo.border} border`}>
               {severityInfo.label}
             </span>

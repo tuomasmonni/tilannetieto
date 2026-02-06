@@ -1,16 +1,19 @@
 /**
  * /api/news - Uutisvalvonta API
- * Hakee RSS-syötteet, analysoi AI:llä ja palauttaa GeoJSON
+ * Hakee RSS-syötteet, analysoi AI:llä, ryhmittelee tapahtumat ja palauttaa GeoJSON
  */
 
 import { NextResponse } from 'next/server';
 import { fetchAllFeeds } from '@/lib/data/news/rss-parser';
 import { analyzeArticles } from '@/lib/data/news/news-analyzer';
-import type { NewsArticle, NewsCategory, NewsSource } from '@/lib/data/news/types';
+import { clusterArticles } from '@/lib/data/news/event-clusterer';
+import type { NewsArticle, NewsEvent, NewsCategory, NewsSource } from '@/lib/data/news/types';
 
 // In-memory cache
 let cache: {
-  data: NewsArticle[];
+  articles: NewsArticle[];
+  events: NewsEvent[];
+  singleArticles: NewsArticle[];
   timestamp: number;
 } | null = null;
 
@@ -27,12 +30,12 @@ function getTimeRangeMs(timeRange: string): number {
   }
 }
 
-async function getArticles(): Promise<NewsArticle[]> {
+async function getData(): Promise<{ articles: NewsArticle[]; events: NewsEvent[]; singleArticles: NewsArticle[] }> {
   const now = Date.now();
 
   if (cache && now - cache.timestamp < CACHE_TTL) {
     console.log('[NewsAPI] Using cache');
-    return cache.data;
+    return { articles: cache.articles, events: cache.events, singleArticles: cache.singleArticles };
   }
 
   console.log('[NewsAPI] Fetching fresh data...');
@@ -47,11 +50,12 @@ async function getArticles(): Promise<NewsArticle[]> {
   });
 
   const articles = await analyzeArticles(unique);
+  const { events, singleArticles } = await clusterArticles(articles);
 
-  cache = { data: articles, timestamp: now };
-  console.log(`[NewsAPI] Cached ${articles.length} articles`);
+  cache = { articles, events, singleArticles, timestamp: now };
+  console.log(`[NewsAPI] Cached ${articles.length} articles, ${events.length} events`);
 
-  return articles;
+  return { articles, events, singleArticles };
 }
 
 export async function GET(request: Request) {
@@ -63,46 +67,44 @@ export async function GET(request: Request) {
     const categoriesParam = searchParams.get('categories');
     const searchQuery = searchParams.get('search');
 
-    let articles = await getArticles();
+    const { articles: allArticles, events: allEvents, singleArticles: allSingles } = await getData();
 
-    // Filter by time range
+    // Apply filters
     const cutoff = Date.now() - getTimeRangeMs(timeRange);
-    articles = articles.filter(
-      (a) => new Date(a.publishedAt).getTime() > cutoff
+    const sources = sourcesParam ? sourcesParam.split(',') as NewsSource[] : null;
+    const categories = categoriesParam ? categoriesParam.split(',') as NewsCategory[] : null;
+    const query = searchQuery?.toLowerCase();
+
+    function matchesFilters(a: NewsArticle): boolean {
+      if (new Date(a.publishedAt).getTime() <= cutoff) return false;
+      if (sources && !sources.includes(a.source)) return false;
+      if (categories && !a.categories.some(c => categories.includes(c))) return false;
+      if (query && !(
+        a.title.toLowerCase().includes(query) ||
+        a.summary.toLowerCase().includes(query) ||
+        a.municipality?.toLowerCase().includes(query)
+      )) return false;
+      return true;
+    }
+
+    // Filter single articles
+    const filteredSingles = allSingles.filter(matchesFilters);
+
+    // Filter events: keep event if any article in the cluster matches
+    const filteredEvents = allEvents.filter(evt =>
+      evt.articles.some(matchesFilters)
     );
 
-    // Filter by sources
-    if (sourcesParam) {
-      const sources = sourcesParam.split(',') as NewsSource[];
-      articles = articles.filter((a) => sources.includes(a.source));
-    }
-
-    // Filter by categories
-    if (categoriesParam) {
-      const categories = categoriesParam.split(',') as NewsCategory[];
-      articles = articles.filter((a) =>
-        a.categories.some((c) => categories.includes(c))
-      );
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      articles = articles.filter(
-        (a) =>
-          a.title.toLowerCase().includes(query) ||
-          a.summary.toLowerCase().includes(query) ||
-          a.municipality?.toLowerCase().includes(query)
-      );
-    }
-
-    // Raw JSON format
+    // For raw JSON
     if (format === 'json') {
+      const filteredArticles = allArticles.filter(matchesFilters);
       return NextResponse.json(
         {
-          articles,
+          articles: filteredArticles,
+          events: filteredEvents,
           metadata: {
-            totalArticles: articles.length,
+            totalArticles: filteredArticles.length,
+            eventCount: filteredEvents.length,
             fetchedAt: new Date().toISOString(),
           },
         },
@@ -114,16 +116,57 @@ export async function GET(request: Request) {
       );
     }
 
-    // GeoJSON format (default)
-    const geoArticles = articles.filter((a) => a.lat !== null && a.lng !== null);
+    // GeoJSON format (default) - combine events and single articles
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const features: any[] = [];
 
-    const geojson = {
-      type: 'FeatureCollection' as const,
-      features: geoArticles.map((article) => ({
+    // Add clustered events
+    for (const evt of filteredEvents) {
+      if (evt.lat === null || evt.lng === null) continue;
+      features.push({
         type: 'Feature' as const,
         geometry: {
           type: 'Point' as const,
-          coordinates: [article.lng!, article.lat!] as [number, number],
+          coordinates: [evt.lng, evt.lat] as [number, number],
+        },
+        properties: {
+          id: evt.id,
+          type: 'news',
+          category: evt.categories[0] || 'muu',
+          allCategories: evt.categories,
+          title: evt.primaryArticle.title,
+          description: evt.mergedSummary,
+          source: evt.primaryArticle.source,
+          sourceUrl: evt.primaryArticle.url,
+          municipality: evt.municipality || '',
+          timestamp: evt.primaryArticle.publishedAt instanceof Date
+            ? evt.primaryArticle.publishedAt.toISOString()
+            : evt.primaryArticle.publishedAt,
+          severity: evt.severity,
+          confidence: evt.confidence,
+          locationName: evt.locationName,
+          isCluster: true,
+          sourceCount: evt.sources.length,
+          allSources: evt.sources.join(','),
+          mergedSummary: evt.mergedSummary,
+          articleCount: evt.articles.length,
+          articleUrls: JSON.stringify(evt.articles.map(a => ({
+            source: a.source,
+            title: a.title,
+            url: a.url,
+          }))),
+        },
+      });
+    }
+
+    // Add single articles
+    for (const article of filteredSingles) {
+      if (article.lat === null || article.lng === null) continue;
+      features.push({
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [article.lng, article.lat] as [number, number],
         },
         properties: {
           id: article.id,
@@ -141,11 +184,23 @@ export async function GET(request: Request) {
           severity: article.severity,
           confidence: article.confidence,
           locationName: article.locationName,
+          isCluster: false,
+          sourceCount: 1,
+          allSources: article.source,
+          articleCount: 1,
         },
-      })),
+      });
+    }
+
+    const totalArticles = allArticles.filter(matchesFilters).length;
+
+    const geojson = {
+      type: 'FeatureCollection' as const,
+      features,
       metadata: {
-        totalArticles: articles.length,
-        geolocated: geoArticles.length,
+        totalArticles,
+        geolocated: features.length,
+        eventCount: filteredEvents.length,
         fetchedAt: new Date().toISOString(),
       },
     };
