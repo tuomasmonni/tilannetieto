@@ -3,7 +3,13 @@
   "features": [
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [25.0564, 60.2058] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.0564,
+          60.2058
+        ]
+      },
       "properties": {
         "id": "hotlips-helsinki",
         "name": "Hot Lips Helsinki",
@@ -14,7 +20,13 @@
     },
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [25.6558, 60.9827] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.6558,
+          60.9827
+        ]
+      },
       "properties": {
         "id": "hotlips-lahti",
         "name": "Hot Lips Lahti",
