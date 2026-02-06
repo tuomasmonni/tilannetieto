@@ -59,6 +59,8 @@ async function fetchTrainDataGraphQL(): Promise<TrainWithLocation[]> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Accept-Encoding': 'gzip',
       'Digitraffic-User': 'tilannekuva.online/1.0',
     },
     body: JSON.stringify({ query: GRAPHQL_QUERY }),
@@ -108,6 +110,7 @@ async function fetchTrainDataGraphQL(): Promise<TrainWithLocation[]> {
 async function fetchTrainLocationsOnly(): Promise<TrainWithLocation[]> {
   const response = await fetch(TRAIN_LOCATIONS_URL, {
     headers: {
+      'Accept': 'application/json',
       'Accept-Encoding': 'gzip',
       'Digitraffic-User': 'tilannekuva.online/1.0',
     },

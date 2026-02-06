@@ -84,10 +84,10 @@ export async function fetchRoadWeatherData(): Promise<RoadWeatherData[]> {
   // Fetch stations and sensor data in parallel
   const [stationsRes, dataRes] = await Promise.all([
     fetch(ROAD_WEATHER_STATIONS_URL, {
-      headers: { 'Accept': 'application/json', 'Accept-Encoding': 'gzip', 'User-Agent': 'tilannekuva.online/1.0' },
+      headers: { 'Accept': 'application/json', 'Accept-Encoding': 'gzip', 'Digitraffic-User': 'tilannekuva.online/1.0' },
     }),
     fetch(ROAD_WEATHER_DATA_URL, {
-      headers: { 'Accept': 'application/json', 'Accept-Encoding': 'gzip', 'User-Agent': 'tilannekuva.online/1.0' },
+      headers: { 'Accept': 'application/json', 'Accept-Encoding': 'gzip', 'Digitraffic-User': 'tilannekuva.online/1.0' },
     }),
   ]);
 

@@ -3,17 +3,58 @@
  *
  * API: https://sotkanet.fi/rest/1.1/
  * Lisenssi: CC BY 4.0 (maininta THL/Sotkanet vaadittu)
+ *
+ * Huom: /json endpoint palauttaa flat-muodon:
+ *   { indicator: 3064, region: 46, year: 2023, gender: "total", value: 196 }
+ * Region on pelkkä ID → tarvitaan /regions endpoint koodimappiin.
  */
 
 const SOTKANET_BASE = 'https://sotkanet.fi/rest/1.1';
 
-export interface SotkanetDataPoint {
-  indicator: { id: number };
-  region: { id: number; code: string; title: { fi: string } };
+interface SotkanetRawDataPoint {
+  indicator: number;
+  region: number;
   year: number;
   gender: string;
   value: number;
   absValue?: number;
+}
+
+interface SotkanetRegion {
+  id: number;
+  code: string;
+  category: string;
+  title: { fi: string; en?: string; sv?: string };
+}
+
+// Välimuisti alueille (ei muutu usein)
+let regionCache: Map<number, SotkanetRegion> | null = null;
+
+/**
+ * Hae Sotkanet-aluetiedot ja rakenna id→alue mapping
+ */
+async function getRegionMap(): Promise<Map<number, SotkanetRegion>> {
+  if (regionCache) return regionCache;
+
+  const url = `${SOTKANET_BASE}/regions`;
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'tilannekuva.online/1.0' },
+    next: { revalidate: 86400 }, // 24h cache
+  });
+
+  if (!response.ok) {
+    throw new Error(`Sotkanet regions API error: ${response.status}`);
+  }
+
+  const regions: SotkanetRegion[] = await response.json();
+  const map = new Map<number, SotkanetRegion>();
+
+  for (const region of regions) {
+    map.set(region.id, region);
+  }
+
+  regionCache = map;
+  return map;
 }
 
 /**
@@ -27,29 +68,33 @@ export async function fetchIndicatorByMunicipality(
   indicatorId: string,
   year: string
 ): Promise<Map<string, { value: number; absValue?: number; regionName: string }>> {
-  const url = `${SOTKANET_BASE}/json?indicator=${indicatorId}&years=${year}&genders=total`;
+  const [dataResponse, regionMap] = await Promise.all([
+    fetch(`${SOTKANET_BASE}/json?indicator=${indicatorId}&years=${year}&genders=total`, {
+      headers: { 'User-Agent': 'tilannekuva.online/1.0' },
+      next: { revalidate: 86400 }, // 24h cache
+    }),
+    getRegionMap(),
+  ]);
 
-  const response = await fetch(url, {
-    next: { revalidate: 86400 }, // 24h cache
-  });
-
-  if (!response.ok) {
-    throw new Error(`Sotkanet API error: ${response.status}`);
+  if (!dataResponse.ok) {
+    throw new Error(`Sotkanet API error: ${dataResponse.status}`);
   }
 
-  const data: SotkanetDataPoint[] = await response.json();
+  const data: SotkanetRawDataPoint[] = await dataResponse.json();
   const result = new Map<string, { value: number; absValue?: number; regionName: string }>();
 
   for (const point of data) {
-    // Sotkanet käyttää region.code muodossa "091" (kuntakoodi)
-    // Suodata vain kunnat (code on 3-numeroinen)
-    const code = point.region.code;
+    const region = regionMap.get(point.region);
+    if (!region) continue;
+
+    // Suodata vain kunnat (3-numeroinen koodi)
+    const code = region.code;
     if (!code || code.length !== 3 || isNaN(Number(code))) continue;
 
     result.set(code, {
       value: point.value,
       absValue: point.absValue,
-      regionName: point.region.title?.fi || code,
+      regionName: region.title?.fi || code,
     });
   }
 
@@ -63,21 +108,23 @@ export async function fetchNationalAverage(
   indicatorId: string,
   year: string
 ): Promise<number | null> {
-  // Sotkanet region code "SSS" = koko maa (mutta Sotkanet käyttää region id:tä)
-  const url = `${SOTKANET_BASE}/json?indicator=${indicatorId}&years=${year}&genders=total`;
+  const [dataResponse, regionMap] = await Promise.all([
+    fetch(`${SOTKANET_BASE}/json?indicator=${indicatorId}&years=${year}&genders=total`, {
+      headers: { 'User-Agent': 'tilannekuva.online/1.0' },
+      next: { revalidate: 86400 },
+    }),
+    getRegionMap(),
+  ]);
 
-  const response = await fetch(url, {
-    next: { revalidate: 86400 },
+  if (!dataResponse.ok) return null;
+
+  const data: SotkanetRawDataPoint[] = await dataResponse.json();
+
+  // Koko Suomi: etsitään region jolla category on tyhjä/MANNER-SUOMI tai id 1
+  const national = data.find(p => {
+    const region = regionMap.get(p.region);
+    return region && (region.id === 1 || region.code === '' || region.category === 'MAA');
   });
-
-  if (!response.ok) return null;
-
-  const data: SotkanetDataPoint[] = await response.json();
-
-  // Koko maan tieto: region code on tyypillisesti tyhjä tai "0" (valtio-taso)
-  const national = data.find(p =>
-    p.region.code === '' || p.region.code === '0' || p.region.id === 1
-  );
 
   return national?.value ?? null;
 }
