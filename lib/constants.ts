@@ -261,5 +261,5 @@ export const LAYER_INFO: Record<LayerKey, { label: string; icon: string; descrip
   housing: { label: 'Asuntohinnat', icon: '🏠', description: 'Tilastokeskus €/m²' },
   population: { label: 'Väestö', icon: '👥', description: 'Tilastokeskus 31.12.' },
   health: { label: 'Terveys', icon: '🏥', description: 'THL/Sotkanet indikaattorit' },
-  hotLips: { label: 'Hot Lips', icon: '🌶️', description: '2 myymälää' },
+  hotLips: { label: 'Hot Lips', icon: '🌶️', description: '8 myymälää' },
 } as const;

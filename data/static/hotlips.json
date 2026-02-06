@@ -6,16 +6,16 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          25.0564,
-          60.2058
+          25.081,
+          60.2086
         ]
       },
       "properties": {
         "id": "hotlips-helsinki",
         "name": "Hot Lips Helsinki",
         "address": "Asiakkaankatu 5, 00930 Helsinki",
-        "phone": "045-174 9122",
-        "schedule": "ma-la 11-19, su suljettu"
+        "phone": "09-3234 817",
+        "schedule": "ma-pe 10-20, la 10-18, su suljettu"
       }
     },
     {
@@ -23,16 +23,118 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          25.6558,
-          60.9827
+          25.6538,
+          60.9822
         ]
       },
       "properties": {
         "id": "hotlips-lahti",
         "name": "Hot Lips Lahti",
-        "address": "Hämeenkatu 7, 15110 Lahti",
+        "address": "Hämeenkatu 7, 15100 Lahti",
         "phone": "040-354 3700",
-        "schedule": "ma-la 11-19, su suljettu"
+        "schedule": "ma-pe 9-20, la 9-19, su suljettu"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4684,
+          60.996
+        ]
+      },
+      "properties": {
+        "id": "hotlips-hameenlinna",
+        "name": "Hot Lips Hämeenlinna",
+        "address": "Palokunnankatu 12, 13100 Hämeenlinna",
+        "phone": "040-686 2512",
+        "schedule": "ma-pe 10-18, la 10-15, su suljettu"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8488,
+          60.6342
+        ]
+      },
+      "properties": {
+        "id": "hotlips-hyvinkaa",
+        "name": "Hot Lips Hyvinkää",
+        "address": "Riihimäenkatu 2, 05900 Hyvinkää",
+        "phone": "019-450 0909",
+        "schedule": "ma-pe 10-18, la 10-15, su suljettu"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27.679,
+          62.895
+        ]
+      },
+      "properties": {
+        "id": "hotlips-kuopio",
+        "name": "Hot Lips Kuopio",
+        "address": "Puijonkatu 24, 70110 Kuopio",
+        "phone": "040-541 2335",
+        "schedule": "ma-pe 10-18, la 10-16, su suljettu"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.1919,
+          61.0592
+        ]
+      },
+      "properties": {
+        "id": "hotlips-lappeenranta",
+        "name": "Hot Lips Lappeenranta",
+        "address": "Valtakatu 50, 53100 Lappeenranta",
+        "phone": "05-411 7780",
+        "schedule": "ma-pe 10-21, la 10-18, su 12-18"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.0313,
+          60.2933
+        ]
+      },
+      "properties": {
+        "id": "hotlips-vantaa-tikkurila",
+        "name": "Hot Lips Vantaa Tikkurila",
+        "address": "Peltolantie 2, 01300 Vantaa",
+        "phone": "09-873 3990",
+        "schedule": "ma-pe 10-18, la 10-15, su suljettu"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8525,
+          60.2697
+        ]
+      },
+      "properties": {
+        "id": "hotlips-vantaa-myyrmaki",
+        "name": "Hot Lips Vantaa Myyrmäki",
+        "address": "Uomatie 4, 01600 Vantaa",
+        "phone": "09-530 2890",
+        "schedule": "ma-pe 10-20, la 10-18, su 12-18"
       }
     }
   ]
