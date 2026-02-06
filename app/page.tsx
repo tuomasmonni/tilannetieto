@@ -70,6 +70,26 @@ const SnowLayer = dynamic(
   { ssr: false }
 );
 
+const UnemploymentLayer = dynamic(
+  () => import('@/components/map/layers/UnemploymentLayer'),
+  { ssr: false }
+);
+
+const HousingLayer = dynamic(
+  () => import('@/components/map/layers/HousingLayer'),
+  { ssr: false }
+);
+
+const PopulationLayer = dynamic(
+  () => import('@/components/map/layers/PopulationLayer'),
+  { ssr: false }
+);
+
+const HealthLayer = dynamic(
+  () => import('@/components/map/layers/HealthLayer'),
+  { ssr: false }
+);
+
 const WeatherCameraModal = dynamic(
   () => import('@/components/ui/WeatherCameraModal'),
   { ssr: false }
@@ -133,6 +153,10 @@ function AppContent() {
             <SnowLayer map={map} onEventSelect={handleEventSelect} />
             <ElectionLayer map={map} />
             <AssociationsLayer map={map} />
+            <UnemploymentLayer map={map} />
+            <HousingLayer map={map} />
+            <PopulationLayer map={map} />
+            <HealthLayer map={map} />
           </>
         )}
       </MapContainer>

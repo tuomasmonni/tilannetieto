@@ -1,0 +1,180 @@
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import type mapboxgl from 'mapbox-gl';
+import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
+import type { PopulationMapGeoJSON } from '@/lib/data/population/api';
+
+const CATEGORY_COLORS: Record<string, string> = {
+  low: '#dbeafe',    // Vaalea sininen
+  medium: '#93c5fd',
+  high: '#3b82f6',
+  very_high: '#1e40af', // Tumma sininen
+};
+
+const SOURCE_ID = 'population-municipalities';
+const FILL_LAYER = 'population-fill';
+const OUTLINE_LAYER = 'population-outline';
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
+interface Props {
+  map: mapboxgl.Map | null;
+}
+
+export function PopulationLayer({ map }: Props) {
+  const { population, setPopulationLoading } = useUnifiedFilters();
+  const { year, layerVisible } = population;
+  const [loaded, setLoaded] = useState(false);
+  const [data, setData] = useState<PopulationMapGeoJSON | null>(null);
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const hoveredStateId = useRef<string | null>(null);
+
+  const debouncedYear = useDebounce(year, 300);
+
+  useEffect(() => {
+    if (!layerVisible) return;
+
+    const loadData = async () => {
+      try {
+        setPopulationLoading(true);
+        const res = await fetch(`/api/population?year=${debouncedYear}`);
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        console.error('Failed to fetch population data:', err);
+      } finally {
+        setPopulationLoading(false);
+      }
+    };
+
+    loadData();
+  }, [debouncedYear, layerVisible, setPopulationLoading]);
+
+  useEffect(() => {
+    if (!map || !data) return;
+
+    const addLayer = () => {
+      try {
+        const existingSource = map.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource;
+        if (existingSource) {
+          existingSource.setData(data as GeoJSON.FeatureCollection);
+          return;
+        }
+
+        map.addSource(SOURCE_ID, {
+          type: 'geojson',
+          data: data as GeoJSON.FeatureCollection,
+          generateId: true,
+        });
+
+        map.addLayer({
+          id: FILL_LAYER,
+          type: 'fill',
+          source: SOURCE_ID,
+          paint: {
+            'fill-color': [
+              'match', ['get', 'category'],
+              'low', CATEGORY_COLORS.low,
+              'medium', CATEGORY_COLORS.medium,
+              'high', CATEGORY_COLORS.high,
+              'very_high', CATEGORY_COLORS.very_high,
+              '#808080'
+            ],
+            'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.9, 0.7],
+          },
+        });
+
+        map.addLayer({
+          id: OUTLINE_LAYER,
+          type: 'line',
+          source: SOURCE_ID,
+          paint: {
+            'line-color': ['case', ['boolean', ['feature-state', 'hover'], false], '#1f2937', '#d1d5db'],
+            'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 2.5, 1],
+          },
+        });
+
+        setLoaded(true);
+      } catch (err) {
+        console.error('Failed to add population layer:', err);
+      }
+    };
+
+    if (map.isStyleLoaded()) addLayer();
+    else map.once('load', addLayer);
+  }, [map, data]);
+
+  useEffect(() => {
+    if (!map || !loaded) return;
+
+    const mapboxgl = require('mapbox-gl');
+    const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, className: 'stat-tooltip' });
+    popupRef.current = popup;
+
+    const onMouseMove = (e: any) => {
+      if (!e.features?.length) return;
+      const feature = e.features[0];
+      const props = feature.properties;
+      const featureId = feature.id;
+
+      if (hoveredStateId.current !== null && hoveredStateId.current !== featureId) {
+        map.setFeatureState({ source: SOURCE_ID, id: hoveredStateId.current } as any, { hover: false });
+      }
+      if (featureId !== undefined) {
+        hoveredStateId.current = featureId;
+        map.setFeatureState({ source: SOURCE_ID, id: featureId } as any, { hover: true });
+      }
+
+      const html = `
+        <div class="backdrop-blur-md bg-white/95 dark:bg-gray-900/95 text-gray-900 dark:text-gray-100 px-3 py-2 rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 min-w-[180px]">
+          <div class="font-semibold text-sm">${props?.nimi || 'Tuntematon'}</div>
+          <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+            <span class="font-medium text-gray-900 dark:text-gray-100">${(props?.population || 0).toLocaleString('fi-FI')} asukasta</span>
+          </div>
+          <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">31.12.${props?.year || year}</div>
+        </div>
+      `;
+
+      popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
+      map.getCanvas().style.cursor = 'pointer';
+    };
+
+    const onMouseLeave = () => {
+      if (hoveredStateId.current !== null) {
+        map.setFeatureState({ source: SOURCE_ID, id: hoveredStateId.current } as any, { hover: false });
+      }
+      hoveredStateId.current = null;
+      popup.remove();
+      map.getCanvas().style.cursor = '';
+    };
+
+    map.on('mousemove', FILL_LAYER, onMouseMove);
+    map.on('mouseleave', FILL_LAYER, onMouseLeave);
+
+    return () => {
+      map.off('mousemove', FILL_LAYER, onMouseMove);
+      map.off('mouseleave', FILL_LAYER, onMouseLeave);
+      popup.remove();
+    };
+  }, [map, loaded, year]);
+
+  useEffect(() => {
+    if (!map || !loaded) return;
+    const visibility = layerVisible ? 'visible' : 'none';
+    for (const id of [FILL_LAYER, OUTLINE_LAYER]) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility);
+    }
+  }, [map, layerVisible, loaded]);
+
+  return null;
+}
+
+export default PopulationLayer;

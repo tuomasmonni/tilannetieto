@@ -105,6 +105,42 @@ interface UnifiedFilterState {
     displayMode: 'count' | 'perCapita';
   };
 
+  // Energia (Fingrid)
+  energy: {
+    layerVisible: boolean;
+  };
+
+  // Työttömyys (Tilastokeskus)
+  unemployment: {
+    year: string;
+    layerVisible: boolean;
+    displayMode: 'absolute' | 'perCapita';
+    isLoading: boolean;
+  };
+
+  // Asuntohinnat (Tilastokeskus)
+  housing: {
+    year: string;
+    layerVisible: boolean;
+    isLoading: boolean;
+  };
+
+  // Väestö (Tilastokeskus)
+  population: {
+    year: string;
+    layerVisible: boolean;
+    displayMode: 'density' | 'absolute';
+    isLoading: boolean;
+  };
+
+  // Terveys (Sotkanet/THL)
+  health: {
+    indicator: string;
+    year: string;
+    layerVisible: boolean;
+    isLoading: boolean;
+  };
+
   // Yleiset asetukset
   theme: MapTheme;
 
@@ -166,6 +202,32 @@ interface UnifiedFilterActions {
   // Associations actions
   setAssociationsLayerVisible: (visible: boolean) => void;
   setAssociationsDisplayMode: (mode: 'count' | 'perCapita') => void;
+
+  // Energy actions
+  setEnergyLayerVisible: (visible: boolean) => void;
+
+  // Unemployment actions
+  setUnemploymentYear: (year: string) => void;
+  setUnemploymentLayerVisible: (visible: boolean) => void;
+  setUnemploymentDisplayMode: (mode: 'absolute' | 'perCapita') => void;
+  setUnemploymentLoading: (loading: boolean) => void;
+
+  // Housing actions
+  setHousingYear: (year: string) => void;
+  setHousingLayerVisible: (visible: boolean) => void;
+  setHousingLoading: (loading: boolean) => void;
+
+  // Population actions
+  setPopulationYear: (year: string) => void;
+  setPopulationLayerVisible: (visible: boolean) => void;
+  setPopulationDisplayMode: (mode: 'density' | 'absolute') => void;
+  setPopulationLoading: (loading: boolean) => void;
+
+  // Health actions
+  setHealthIndicator: (indicator: string) => void;
+  setHealthYear: (year: string) => void;
+  setHealthLayerVisible: (visible: boolean) => void;
+  setHealthLoading: (loading: boolean) => void;
 
   // General actions
   setTheme: (theme: MapTheme) => void;
@@ -229,6 +291,32 @@ const DEFAULT_STATE: UnifiedFilterState = {
   associations: {
     layerVisible: false,
     displayMode: 'count',
+  },
+  energy: {
+    layerVisible: false,
+  },
+  unemployment: {
+    year: '2024',
+    layerVisible: false,
+    displayMode: 'perCapita',
+    isLoading: false,
+  },
+  housing: {
+    year: '2024',
+    layerVisible: false,
+    isLoading: false,
+  },
+  population: {
+    year: '2024',
+    layerVisible: false,
+    displayMode: 'density',
+    isLoading: false,
+  },
+  health: {
+    indicator: '3064', // Sairastavuusindeksi (THL)
+    year: '2023',
+    layerVisible: false,
+    isLoading: false,
   },
   theme: 'dark',
   activeGroup: null,
@@ -541,6 +629,128 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     }));
   }, []);
 
+  // ========== ENERGY ACTIONS ==========
+
+  const setEnergyLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => ({
+      ...prev,
+      energy: { ...prev.energy, layerVisible: visible },
+    }));
+  }, []);
+
+  // ========== UNEMPLOYMENT ACTIONS ==========
+
+  const setUnemploymentYear = useCallback((year: string) => {
+    setState(prev => ({
+      ...prev,
+      unemployment: { ...prev.unemployment, year },
+    }));
+  }, []);
+
+  const setUnemploymentLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => ({
+      ...prev,
+      unemployment: { ...prev.unemployment, layerVisible: visible },
+    }));
+  }, []);
+
+  const setUnemploymentDisplayMode = useCallback((mode: 'absolute' | 'perCapita') => {
+    setState(prev => ({
+      ...prev,
+      unemployment: { ...prev.unemployment, displayMode: mode },
+    }));
+  }, []);
+
+  const setUnemploymentLoading = useCallback((loading: boolean) => {
+    setState(prev => ({
+      ...prev,
+      unemployment: { ...prev.unemployment, isLoading: loading },
+    }));
+  }, []);
+
+  // ========== HOUSING ACTIONS ==========
+
+  const setHousingYear = useCallback((year: string) => {
+    setState(prev => ({
+      ...prev,
+      housing: { ...prev.housing, year },
+    }));
+  }, []);
+
+  const setHousingLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => ({
+      ...prev,
+      housing: { ...prev.housing, layerVisible: visible },
+    }));
+  }, []);
+
+  const setHousingLoading = useCallback((loading: boolean) => {
+    setState(prev => ({
+      ...prev,
+      housing: { ...prev.housing, isLoading: loading },
+    }));
+  }, []);
+
+  // ========== POPULATION ACTIONS ==========
+
+  const setPopulationYear = useCallback((year: string) => {
+    setState(prev => ({
+      ...prev,
+      population: { ...prev.population, year },
+    }));
+  }, []);
+
+  const setPopulationLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => ({
+      ...prev,
+      population: { ...prev.population, layerVisible: visible },
+    }));
+  }, []);
+
+  const setPopulationDisplayMode = useCallback((mode: 'density' | 'absolute') => {
+    setState(prev => ({
+      ...prev,
+      population: { ...prev.population, displayMode: mode },
+    }));
+  }, []);
+
+  const setPopulationLoading = useCallback((loading: boolean) => {
+    setState(prev => ({
+      ...prev,
+      population: { ...prev.population, isLoading: loading },
+    }));
+  }, []);
+
+  // ========== HEALTH ACTIONS ==========
+
+  const setHealthIndicator = useCallback((indicator: string) => {
+    setState(prev => ({
+      ...prev,
+      health: { ...prev.health, indicator },
+    }));
+  }, []);
+
+  const setHealthYear = useCallback((year: string) => {
+    setState(prev => ({
+      ...prev,
+      health: { ...prev.health, year },
+    }));
+  }, []);
+
+  const setHealthLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => ({
+      ...prev,
+      health: { ...prev.health, layerVisible: visible },
+    }));
+  }, []);
+
+  const setHealthLoading = useCallback((loading: boolean) => {
+    setState(prev => ({
+      ...prev,
+      health: { ...prev.health, isLoading: loading },
+    }));
+  }, []);
+
   // ========== GENERAL ACTIONS ==========
 
   const setTheme = useCallback((theme: MapTheme) => {
@@ -583,6 +793,22 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     setElectionLayerVisible,
     setAssociationsLayerVisible,
     setAssociationsDisplayMode,
+    setEnergyLayerVisible,
+    setUnemploymentYear,
+    setUnemploymentLayerVisible,
+    setUnemploymentDisplayMode,
+    setUnemploymentLoading,
+    setHousingYear,
+    setHousingLayerVisible,
+    setHousingLoading,
+    setPopulationYear,
+    setPopulationLayerVisible,
+    setPopulationDisplayMode,
+    setPopulationLoading,
+    setHealthIndicator,
+    setHealthYear,
+    setHealthLayerVisible,
+    setHealthLoading,
     setTheme,
     resetFilters,
     setActiveGroup,

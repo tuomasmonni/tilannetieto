@@ -3,7 +3,7 @@
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import { LAYER_GROUPS, type LayerGroupKey } from '@/lib/constants';
 
-const TAB_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'statistics', 'media'];
+const TAB_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'energy', 'statistics', 'health', 'media'];
 
 interface BottomTabBarProps {
   onTabSelect: (group: LayerGroupKey) => void;

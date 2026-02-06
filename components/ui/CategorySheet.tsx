@@ -12,6 +12,11 @@ import NewsSettings from './settings/NewsSettings';
 import TrainSettings from './settings/TrainSettings';
 import ElectionSettings from './settings/ElectionSettings';
 import AssociationsSettings from './settings/AssociationsSettings';
+import EnergyWidget from './EnergyWidget';
+import UnemploymentSettings from './settings/UnemploymentSettings';
+import HousingSettings from './settings/HousingSettings';
+import PopulationSettings from './settings/PopulationSettings';
+import HealthSettings from './settings/HealthSettings';
 
 interface CategorySheetProps {
   group: LayerGroupKey | null;
@@ -32,6 +37,11 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     snow,
     election,
     associations,
+    energy,
+    unemployment,
+    housing,
+    population,
+    health,
     setWeatherLayerVisible,
     setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
@@ -43,6 +53,11 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     setSnowLayerVisible,
     setElectionLayerVisible,
     setAssociationsLayerVisible,
+    setEnergyLayerVisible,
+    setUnemploymentLayerVisible,
+    setHousingLayerVisible,
+    setPopulationLayerVisible,
+    setHealthLayerVisible,
   } = useUnifiedFilters();
 
   const isDark = theme === 'dark';
@@ -63,13 +78,20 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     snow: { visible: snow.layerVisible, toggle: setSnowLayerVisible },
     election: { visible: election.layerVisible, toggle: setElectionLayerVisible },
     associations: { visible: associations.layerVisible, toggle: setAssociationsLayerVisible },
+    energy: { visible: energy.layerVisible, toggle: setEnergyLayerVisible },
+    unemployment: { visible: unemployment.layerVisible, toggle: setUnemploymentLayerVisible },
+    housing: { visible: housing.layerVisible, toggle: setHousingLayerVisible },
+    population: { visible: population.layerVisible, toggle: setPopulationLayerVisible },
+    health: { visible: health.layerVisible, toggle: setHealthLayerVisible },
   }), [
     weather.layerVisible, roadWeather.layerVisible, weatherCamera.layerVisible,
     traffic.layerVisible, transit.layerVisible, crime.layerVisible, news.layerVisible,
     train.layerVisible, snow.layerVisible, election.layerVisible, associations.layerVisible,
+    energy.layerVisible, unemployment.layerVisible, housing.layerVisible, population.layerVisible, health.layerVisible,
     setWeatherLayerVisible, setRoadWeatherLayerVisible, setWeatherCameraLayerVisible,
     setTrafficLayerVisible, setTransitLayerVisible, setCrimeLayerVisible, setNewsLayerVisible,
     setTrainLayerVisible, setSnowLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
+    setEnergyLayerVisible, setUnemploymentLayerVisible, setHousingLayerVisible, setPopulationLayerVisible, setHealthLayerVisible,
   ]);
 
   const layerSettings: Record<string, React.ReactNode> = {
@@ -81,6 +103,11 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     train: <TrainSettings />,
     election: <ElectionSettings />,
     associations: <AssociationsSettings />,
+    energy: <EnergyWidget />,
+    unemployment: <UnemploymentSettings />,
+    housing: <HousingSettings />,
+    population: <PopulationSettings />,
+    health: <HealthSettings />,
   };
 
   const closeSheet = useCallback(() => {

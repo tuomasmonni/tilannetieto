@@ -181,8 +181,8 @@ export type NewsSourceKey = keyof typeof NEWS_SOURCES;
 // LAYER GROUPS (Category Navigator)
 // ============================================
 
-export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations';
-export type LayerGroupKey = 'weather' | 'traffic' | 'statistics' | 'media';
+export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations' | 'energy' | 'unemployment' | 'housing' | 'population' | 'health';
+export type LayerGroupKey = 'weather' | 'traffic' | 'statistics' | 'media' | 'energy' | 'health';
 
 export interface LayerGroupConfig {
   label: string;
@@ -207,12 +207,26 @@ export const LAYER_GROUPS: Record<LayerGroupKey, LayerGroupConfig> = {
     tailwindColor: 'group-traffic',
     layers: ['traffic', 'transit', 'train'],
   },
+  energy: {
+    label: 'Energia',
+    icon: '⚡',
+    color: '#22c55e',
+    tailwindColor: 'group-energy',
+    layers: ['energy'],
+  },
   statistics: {
     label: 'Tilastot',
     icon: '📊',
     color: '#3b82f6',
     tailwindColor: 'group-statistics',
-    layers: ['crime', 'election', 'associations'],
+    layers: ['crime', 'unemployment', 'housing', 'population', 'election', 'associations'],
+  },
+  health: {
+    label: 'Terveys',
+    icon: '🏥',
+    color: '#10b981',
+    tailwindColor: 'group-health',
+    layers: ['health'],
   },
   media: {
     label: 'Media',
@@ -235,4 +249,9 @@ export const LAYER_INFO: Record<LayerKey, { label: string; icon: string; descrip
   snow: { label: 'Lumitilanne', icon: '❄️', description: 'FMI lumensyvyys' },
   election: { label: 'Eduskuntavaalit', icon: '🏛️', description: 'Vaalitulokset kunnittain' },
   associations: { label: 'Yhdistykset', icon: '🤝', description: 'Rekisteröidyt yhdistykset' },
+  energy: { label: 'Sähköjärjestelmä', icon: '⚡', description: 'Fingrid reaaliaikainen' },
+  unemployment: { label: 'Työttömyys', icon: '📉', description: 'Tilastokeskus kunnittain' },
+  housing: { label: 'Asuntohinnat', icon: '🏠', description: 'Tilastokeskus €/m²' },
+  population: { label: 'Väestö', icon: '👥', description: 'Tilastokeskus 31.12.' },
+  health: { label: 'Terveys', icon: '🏥', description: 'THL/Sotkanet indikaattorit' },
 } as const;
