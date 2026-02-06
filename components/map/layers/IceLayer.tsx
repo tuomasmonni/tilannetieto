@@ -2,10 +2,11 @@
 
 import mapboxgl from 'mapbox-gl';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
+import type { EventDetails } from '@/lib/types';
 
 interface IceLayerProps {
   map: mapboxgl.Map;
-  onEventSelect?: (event: unknown) => void;
+  onEventSelect?: (event: EventDetails | null) => void;
 }
 
 export default function IceLayer({ map, onEventSelect }: IceLayerProps) {

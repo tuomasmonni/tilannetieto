@@ -346,9 +346,6 @@ const DEFAULT_STATE: UnifiedFilterState = {
     layerVisible: false,
     isLoading: false,
   },
-  ice: {
-    layerVisible: false,
-  },
   hotLips: {
     layerVisible: false,
   },
