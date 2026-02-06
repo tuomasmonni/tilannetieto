@@ -34,9 +34,10 @@ export async function getCached<T>(key: string): Promise<T | null> {
     if (!response.ok) return null;
 
     const data = await response.json();
-    if (!data.result) return null;
+    const raw = data.result ?? data.value;
+    if (!raw) return null;
 
-    return JSON.parse(data.result) as T;
+    return (typeof raw === 'string' ? JSON.parse(raw) : raw) as T;
   } catch (error) {
     console.error(`Redis getCached error (${key}):`, error);
     return null;
