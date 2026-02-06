@@ -138,6 +138,17 @@ function AppContent() {
         <Sidebar />
       </div>
 
+      {/* Beta Banner */}
+      <div className={`absolute top-12 lg:top-0 left-0 lg:left-[360px] right-0 z-20 flex justify-center pointer-events-none`}>
+        <div className={`pointer-events-auto mt-2 px-3 py-1.5 rounded-full text-xs font-medium shadow-lg backdrop-blur border ${
+          theme === 'dark'
+            ? 'bg-amber-900/80 text-amber-200 border-amber-700/50'
+            : 'bg-amber-50/90 text-amber-800 border-amber-200/80'
+        }`}>
+          Testiversio — osa ominaisuuksista on vielä kehityksessä
+        </div>
+      </div>
+
       {/* Map Container */}
       <MapContainer onMapReady={handleMapReady} theme={theme}>
         {map && (
