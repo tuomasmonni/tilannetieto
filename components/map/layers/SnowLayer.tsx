@@ -46,9 +46,9 @@ export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
     };
   }, [snow.layerVisible]);
 
-  // Setup source & layers
+  // Setup source & layers + update data (combined to avoid race condition)
   useEffect(() => {
-    if (!map) return;
+    if (!map || !data) return;
 
     const setup = async () => {
       try {
@@ -57,16 +57,42 @@ export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
         console.error('Failed to load snow icons:', error);
       }
 
+      // Enrich data: extract snowDepth to top-level property for Mapbox expressions
+      const enriched: EventFeatureCollection = {
+        type: 'FeatureCollection',
+        features: data.features.map(f => {
+          let snowDepth = 0;
+          try {
+            const meta = typeof f.properties.metadata === 'string'
+              ? JSON.parse(f.properties.metadata)
+              : f.properties.metadata;
+            snowDepth = meta?.snowDepth ?? 0;
+          } catch { /* ignore */ }
+
+          return {
+            ...f,
+            properties: {
+              ...f.properties,
+              snowDepth,
+            },
+          };
+        }),
+      };
+
+      // Add or update source
       if (!map.getSource(SOURCE_ID)) {
         map.addSource(SOURCE_ID, {
           type: 'geojson',
-          data: { type: 'FeatureCollection', features: [] },
+          data: enriched,
           cluster: true,
           clusterMaxZoom: 9,
           clusterRadius: 40,
         });
+      } else {
+        (map.getSource(SOURCE_ID) as any).setData(enriched);
       }
 
+      // Add layers if not exist
       if (!map.getLayer(CLUSTER_LAYER)) {
         // Cluster circles
         map.addLayer({
@@ -212,44 +238,8 @@ export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
       }
     };
 
-    if (map.isStyleLoaded()) {
-      setup();
-    } else {
-      map.on('load', setup);
-    }
-  }, [map, onEventSelect]);
-
-  // Update data
-  useEffect(() => {
-    if (!map || !data) return;
-
-    const source = map.getSource(SOURCE_ID);
-    if (!source || !('setData' in source)) return;
-
-    // Lisää snowDepth ylätason propertyyn (Mapbox expression pääsyyn)
-    const enriched: EventFeatureCollection = {
-      type: 'FeatureCollection',
-      features: data.features.map(f => {
-        let snowDepth = 0;
-        try {
-          const meta = typeof f.properties.metadata === 'string'
-            ? JSON.parse(f.properties.metadata)
-            : f.properties.metadata;
-          snowDepth = meta?.snowDepth ?? 0;
-        } catch { /* ignore */ }
-
-        return {
-          ...f,
-          properties: {
-            ...f.properties,
-            snowDepth,
-          },
-        };
-      }),
-    };
-
-    source.setData(enriched);
-  }, [map, data]);
+    setup();
+  }, [map, data, snow.layerVisible, onEventSelect]);
 
   // Visibility control
   useEffect(() => {
