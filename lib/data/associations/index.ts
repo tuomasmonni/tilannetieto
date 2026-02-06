@@ -1,0 +1,1 @@
+export { fetchAssociationsMapData } from './api';

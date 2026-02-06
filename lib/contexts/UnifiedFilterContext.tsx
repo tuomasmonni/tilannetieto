@@ -242,35 +242,6 @@ const UnifiedFilterContext = createContext<
   (UnifiedFilterState & UnifiedFilterActions) | null
 >(null);
 
-// ============================================
-// HELPERS
-// ============================================
-
-function getLayerVisibleKey(layer: LayerKey): keyof UnifiedFilterState {
-  return layer;
-}
-
-function turnOffGroupLayers(state: UnifiedFilterState, group: LayerGroupKey): UnifiedFilterState {
-  const layers = LAYER_GROUPS[group].layers;
-  let newState = { ...state };
-  for (const layer of layers) {
-    const key = getLayerVisibleKey(layer);
-    newState = {
-      ...newState,
-      [key]: { ...(newState[key] as Record<string, unknown>), layerVisible: false },
-    };
-  }
-  return newState;
-}
-
-function findGroupForLayer(layer: LayerKey): LayerGroupKey | null {
-  for (const [groupKey, group] of Object.entries(LAYER_GROUPS)) {
-    if (group.layers.includes(layer)) {
-      return groupKey as LayerGroupKey;
-    }
-  }
-  return null;
-}
 
 // ============================================
 // PROVIDER
@@ -286,23 +257,7 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== GROUP LOGIC ==========
 
   const setActiveGroup = useCallback((group: LayerGroupKey | null) => {
-    setState(prev => {
-      if (group === null) {
-        // Turn off all layers of the current active group
-        if (prev.activeGroup) {
-          return { ...turnOffGroupLayers(prev, prev.activeGroup), activeGroup: null };
-        }
-        return { ...prev, activeGroup: null };
-      }
-
-      // If switching to a different group, turn off old group's layers
-      let newState = { ...prev };
-      if (prev.activeGroup && prev.activeGroup !== group) {
-        newState = turnOffGroupLayers(newState, prev.activeGroup);
-      }
-
-      return { ...newState, activeGroup: group };
-    });
+    setState(prev => ({ ...prev, activeGroup: group }));
   }, []);
 
   const getActiveLayerCount = useCallback((group: LayerGroupKey): number => {
@@ -312,46 +267,6 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
       return layerState.layerVisible;
     }).length;
   }, [state]);
-
-  // ========== LAYER TOGGLE WITH GROUP AWARENESS ==========
-
-  const toggleLayerWithGroup = useCallback((layer: LayerKey, visible: boolean, updater: (prev: UnifiedFilterState) => UnifiedFilterState) => {
-    setState(prev => {
-      let newState = updater(prev);
-
-      if (visible) {
-        // When enabling a layer, activate its group and turn off other groups
-        const group = findGroupForLayer(layer);
-        if (group) {
-          if (prev.activeGroup && prev.activeGroup !== group) {
-            newState = turnOffGroupLayers(newState, prev.activeGroup);
-          }
-          // Re-apply the layer visibility since turnOffGroupLayers might have turned it off
-          // if the layer was in the previously active group (shouldn't happen, but safety)
-          newState = {
-            ...newState,
-            [layer]: { ...(newState[layer] as Record<string, unknown>), layerVisible: true },
-            activeGroup: group,
-          };
-        }
-      } else {
-        // When disabling a layer, check if group still has active layers
-        const group = findGroupForLayer(layer);
-        if (group) {
-          const otherLayersInGroup = LAYER_GROUPS[group].layers.filter(l => l !== layer);
-          const hasOtherActive = otherLayersInGroup.some(l => {
-            const ls = newState[l] as { layerVisible: boolean };
-            return ls.layerVisible;
-          });
-          if (!hasOtherActive) {
-            newState = { ...newState, activeGroup: null };
-          }
-        }
-      }
-
-      return newState;
-    });
-  }, []);
 
   // ========== CRIME ACTIONS ==========
 
@@ -402,11 +317,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   }, []);
 
   const setCrimeLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('crime', visible, prev => ({
+    setState(prev => ({
       ...prev,
       crime: { ...prev.crime, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const setCrimeLoading = useCallback((loading: boolean) => {
     setState(prev => ({
@@ -445,20 +360,20 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   }, []);
 
   const setTrafficLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('traffic', visible, prev => ({
+    setState(prev => ({
       ...prev,
       traffic: { ...prev.traffic, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   // ========== WEATHER ACTIONS ==========
 
   const setWeatherLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('weather', visible, prev => ({
+    setState(prev => ({
       ...prev,
       weather: { ...prev.weather, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const setWeatherMetric = useCallback((metric: WeatherMetric) => {
     setState(prev => ({
@@ -470,11 +385,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== TRANSIT ACTIONS ==========
 
   const setTransitLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('transit', visible, prev => ({
+    setState(prev => ({
       ...prev,
       transit: { ...prev.transit, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const toggleTransitVehicleType = useCallback((type: TransitVehicleType) => {
     setState(prev => {
@@ -492,20 +407,20 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== ROAD WEATHER ACTIONS ==========
 
   const setRoadWeatherLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('roadWeather', visible, prev => ({
+    setState(prev => ({
       ...prev,
       roadWeather: { ...prev.roadWeather, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   // ========== WEATHER CAMERA ACTIONS ==========
 
   const setWeatherCameraLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('weatherCamera', visible, prev => ({
+    setState(prev => ({
       ...prev,
       weatherCamera: { ...prev.weatherCamera, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const setSelectedWeatherCamera = useCallback((stationId: string | null) => {
     setState(prev => ({
@@ -517,11 +432,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== NEWS ACTIONS ==========
 
   const setNewsLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('news', visible, prev => ({
+    setState(prev => ({
       ...prev,
       news: { ...prev.news, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const setNewsTimeRange = useCallback((timeRange: '1h' | '6h' | '24h' | '7d' | '30d') => {
     setState(prev => ({
@@ -566,11 +481,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== TRAIN ACTIONS ==========
 
   const setTrainLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('train', visible, prev => ({
+    setState(prev => ({
       ...prev,
       train: { ...prev.train, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const toggleTrainType = useCallback((type: TrainType) => {
     setState(prev => {
@@ -588,11 +503,11 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   // ========== SNOW ACTIONS ==========
 
   const setSnowLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('snow', visible, prev => ({
+    setState(prev => ({
       ...prev,
       snow: { ...prev.snow, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   // ========== ELECTION ACTIONS ==========
 
@@ -604,20 +519,20 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
   }, []);
 
   const setElectionLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('election', visible, prev => ({
+    setState(prev => ({
       ...prev,
       election: { ...prev.election, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   // ========== ASSOCIATIONS ACTIONS ==========
 
   const setAssociationsLayerVisible = useCallback((visible: boolean) => {
-    toggleLayerWithGroup('associations', visible, prev => ({
+    setState(prev => ({
       ...prev,
       associations: { ...prev.associations, layerVisible: visible },
     }));
-  }, [toggleLayerWithGroup]);
+  }, []);
 
   const setAssociationsDisplayMode = useCallback((mode: 'count' | 'perCapita') => {
     setState(prev => ({

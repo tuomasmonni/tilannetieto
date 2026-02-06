@@ -1,0 +1,1243 @@
+{
+  "metadata": {
+    "source": "PRH Yhdistysrekisteri",
+    "total": 105000,
+    "fetchedAt": "2026-02-06T00:00:00Z"
+  },
+  "municipalityNames": {
+    "102": "Huittinen",
+    "103": "Humppila",
+    "105": "Hyrynsalmi",
+    "106": "Hyvinkää",
+    "108": "Hämeenkyrö",
+    "109": "Hämeenlinna",
+    "111": "Heinola",
+    "139": "Ii",
+    "140": "Iisalmi",
+    "142": "Iitti",
+    "143": "Ikaalinen",
+    "145": "Ilmajoki",
+    "146": "Ilomantsi",
+    "148": "Inari",
+    "149": "Inkoo",
+    "151": "Isojoki",
+    "152": "Isokyrö",
+    "153": "Imatra",
+    "165": "Janakkala",
+    "167": "Joensuu",
+    "169": "Jokioinen",
+    "170": "Jomala",
+    "171": "Joroinen",
+    "172": "Joutsa",
+    "176": "Juuka",
+    "177": "Juupajoki",
+    "178": "Juva",
+    "179": "Jyväskylä",
+    "181": "Jämijärvi",
+    "182": "Jämsä",
+    "186": "Järvenpää",
+    "202": "Kaarina",
+    "204": "Kaavi",
+    "205": "Kajaani",
+    "208": "Kalajoki",
+    "211": "Kangasala",
+    "213": "Kangasniemi",
+    "214": "Kankaanpää",
+    "216": "Kannonkoski",
+    "217": "Kannus",
+    "218": "Karijoki",
+    "224": "Karkkila",
+    "226": "Karstula",
+    "230": "Karvia",
+    "231": "Kaskinen",
+    "232": "Kauhajoki",
+    "233": "Kauhava",
+    "235": "Kauniainen",
+    "236": "Kaustinen",
+    "239": "Keitele",
+    "240": "Kemi",
+    "241": "Keminmaa",
+    "244": "Kempele",
+    "245": "Kerava",
+    "249": "Keuruu",
+    "250": "Kihniö",
+    "256": "Kinnula",
+    "257": "Kirkkonummi",
+    "260": "Kitee",
+    "261": "Kittilä",
+    "263": "Kiuruvesi",
+    "265": "Kivijärvi",
+    "271": "Kokemäki",
+    "272": "Kokkola",
+    "273": "Kolari",
+    "275": "Konnevesi",
+    "276": "Kontiolahti",
+    "280": "Korsnäs",
+    "284": "Koski Tl",
+    "285": "Kotka",
+    "286": "Kouvola",
+    "287": "Kristiinankaupunki",
+    "288": "Kruunupyy",
+    "290": "Kuhmo",
+    "291": "Kuhmoinen",
+    "295": "Kumlinge",
+    "297": "Kuopio",
+    "300": "Kuortane",
+    "301": "Kurikka",
+    "304": "Kustavi",
+    "305": "Kuusamo",
+    "309": "Outokumpu",
+    "312": "Kyyjärvi",
+    "316": "Kärkölä",
+    "317": "Kärsämäki",
+    "318": "Kökar",
+    "320": "Kemijärvi",
+    "322": "Kemiönsaari",
+    "398": "Lahti",
+    "399": "Laihia",
+    "400": "Laitila",
+    "402": "Lapinlahti",
+    "403": "Lappajärvi",
+    "405": "Lappeenranta",
+    "407": "Lapinjärvi",
+    "408": "Lapua",
+    "410": "Laukaa",
+    "416": "Lemi",
+    "417": "Lemland",
+    "418": "Lempäälä",
+    "420": "Leppävirta",
+    "421": "Lestijärvi",
+    "422": "Lieksa",
+    "423": "Lieto",
+    "425": "Liminka",
+    "426": "Liperi",
+    "430": "Loimaa",
+    "433": "Loppi",
+    "434": "Loviisa",
+    "435": "Luhanka",
+    "436": "Lumijoki",
+    "438": "Lumparland",
+    "440": "Luoto",
+    "441": "Luumäki",
+    "444": "Lohja",
+    "445": "Parainen",
+    "475": "Maalahti",
+    "478": "Maarianhamina - Mariehamn",
+    "480": "Marttila",
+    "481": "Masku",
+    "483": "Merijärvi",
+    "484": "Merikarvia",
+    "489": "Miehikkälä",
+    "491": "Mikkeli",
+    "494": "Muhos",
+    "495": "Multia",
+    "498": "Muonio",
+    "499": "Mustasaari",
+    "500": "Muurame",
+    "503": "Mynämäki",
+    "504": "Myrskylä",
+    "505": "Mäntsälä",
+    "507": "Mäntyharju",
+    "508": "Mänttä-Vilppula",
+    "529": "Naantali",
+    "531": "Nakkila",
+    "535": "Nivala",
+    "536": "Nokia",
+    "538": "Nousiainen",
+    "541": "Nurmes",
+    "543": "Nurmijärvi",
+    "545": "Närpiö",
+    "560": "Orimattila",
+    "561": "Oripää",
+    "562": "Orivesi",
+    "563": "Oulainen",
+    "564": "Oulu",
+    "576": "Padasjoki",
+    "577": "Paimio",
+    "578": "Paltamo",
+    "580": "Parikkala",
+    "581": "Parkano",
+    "583": "Pelkosenniemi",
+    "584": "Perho",
+    "592": "Petäjävesi",
+    "593": "Pieksämäki",
+    "595": "Pielavesi",
+    "598": "Pietarsaari",
+    "599": "Pedersören kunta",
+    "601": "Pihtipudas",
+    "604": "Pirkkala",
+    "607": "Polvijärvi",
+    "608": "Pomarkku",
+    "609": "Pori",
+    "611": "Pornainen",
+    "614": "Posio",
+    "615": "Pudasjärvi",
+    "616": "Pukkila",
+    "619": "Punkalaidun",
+    "620": "Puolanka",
+    "623": "Puumala",
+    "624": "Pyhtää",
+    "625": "Pyhäjoki",
+    "626": "Pyhäjärvi",
+    "630": "Pyhäntä",
+    "631": "Pyhäranta",
+    "635": "Pälkäne",
+    "636": "Pöytyä",
+    "638": "Porvoo",
+    "678": "Raahe",
+    "680": "Raisio",
+    "681": "Rantasalmi",
+    "683": "Ranua",
+    "684": "Rauma",
+    "686": "Rautalampi",
+    "687": "Rautavaara",
+    "689": "Rautjärvi",
+    "691": "Reisjärvi",
+    "694": "Riihimäki",
+    "697": "Ristijärvi",
+    "698": "Rovaniemi",
+    "700": "Ruokolahti",
+    "702": "Ruovesi",
+    "704": "Rusko",
+    "707": "Rääkkylä",
+    "710": "Raasepori",
+    "729": "Saarijärvi",
+    "732": "Salla",
+    "734": "Salo",
+    "736": "Saltvik",
+    "738": "Sauvo",
+    "739": "Savitaipale",
+    "740": "Savonlinna",
+    "742": "Savukoski",
+    "743": "Seinäjoki",
+    "746": "Sievi",
+    "747": "Siikainen",
+    "748": "Siikajoki",
+    "749": "Siilinjärvi",
+    "751": "Simo",
+    "753": "Sipoo",
+    "755": "Siuntio",
+    "758": "Sodankylä",
+    "759": "Soini",
+    "761": "Somero",
+    "762": "Sonkajärvi",
+    "765": "Sotkamo",
+    "766": "Sottunga",
+    "768": "Sulkava",
+    "771": "Sund",
+    "777": "Suomussalmi",
+    "778": "Suonenjoki",
+    "781": "Sysmä",
+    "783": "Säkylä",
+    "785": "Vaala",
+    "790": "Sastamala",
+    "791": "Siikalatva",
+    "831": "Taipalsaari",
+    "832": "Taivalkoski",
+    "833": "Taivassalo",
+    "834": "Tammela",
+    "837": "Tampere",
+    "844": "Tervo",
+    "845": "Tervola",
+    "846": "Teuva",
+    "848": "Tohmajärvi",
+    "849": "Toholampi",
+    "850": "Toivakka",
+    "851": "Tornio",
+    "853": "Turku",
+    "854": "Pello",
+    "857": "Tuusniemi",
+    "858": "Tuusula",
+    "859": "Tyrnävä",
+    "886": "Ulvila",
+    "887": "Urjala",
+    "889": "Utajärvi",
+    "890": "Utsjoki",
+    "892": "Uurainen",
+    "893": "Uusikaarlepyy",
+    "895": "Uusikaupunki",
+    "905": "Vaasa",
+    "908": "Valkeakoski",
+    "915": "Varkaus",
+    "918": "Vehmaa",
+    "921": "Vesanto",
+    "922": "Vesilahti",
+    "924": "Veteli",
+    "925": "Vieremä",
+    "927": "Vihti",
+    "931": "Viitasaari",
+    "934": "Vimpeli",
+    "935": "Virolahti",
+    "936": "Virrat",
+    "941": "Vårdö",
+    "946": "Vöyri",
+    "976": "Ylitornio",
+    "977": "Ylivieska",
+    "980": "Ylöjärvi",
+    "981": "Ypäjä",
+    "989": "Ähtäri",
+    "992": "Äänekoski",
+    "005": "Alajärvi",
+    "009": "Alavieska",
+    "010": "Alavus",
+    "016": "Asikkala",
+    "018": "Askola",
+    "019": "Aura",
+    "020": "Akaa",
+    "035": "Brändö",
+    "043": "Eckerö",
+    "046": "Enonkoski",
+    "047": "Enontekiö",
+    "049": "Espoo",
+    "050": "Eura",
+    "051": "Eurajoki",
+    "052": "Evijärvi",
+    "060": "Finström",
+    "061": "Forssa",
+    "062": "Föglö",
+    "065": "Geta",
+    "069": "Haapajärvi",
+    "071": "Haapavesi",
+    "072": "Hailuoto",
+    "074": "Halsua",
+    "075": "Hamina",
+    "076": "Hammarland",
+    "077": "Hankasalmi",
+    "078": "Hanko",
+    "079": "Harjavalta",
+    "081": "Hartola",
+    "082": "Hattula",
+    "086": "Hausjärvi",
+    "090": "Heinävesi",
+    "091": "Helsinki",
+    "092": "Vantaa",
+    "097": "Hirvensalmi",
+    "098": "Hollola"
+  },
+  "associations": {
+    "102": {
+      "total": 283
+    },
+    "103": {
+      "total": 84
+    },
+    "105": {
+      "total": 80
+    },
+    "106": {
+      "total": 862
+    },
+    "108": {
+      "total": 225
+    },
+    "109": {
+      "total": 838
+    },
+    "111": {
+      "total": 313
+    },
+    "139": {
+      "total": 259
+    },
+    "140": {
+      "total": 366
+    },
+    "142": {
+      "total": 141
+    },
+    "143": {
+      "total": 147
+    },
+    "145": {
+      "total": 266
+    },
+    "146": {
+      "total": 143
+    },
+    "148": {
+      "total": 175
+    },
+    "149": {
+      "total": 143
+    },
+    "151": {
+      "total": 81
+    },
+    "152": {
+      "total": 146
+    },
+    "153": {
+      "total": 421
+    },
+    "165": {
+      "total": 334
+    },
+    "167": {
+      "total": 984
+    },
+    "169": {
+      "total": 144
+    },
+    "170": {
+      "total": 132
+    },
+    "171": {
+      "total": 151
+    },
+    "172": {
+      "total": 107
+    },
+    "176": {
+      "total": 144
+    },
+    "177": {
+      "total": 55
+    },
+    "178": {
+      "total": 154
+    },
+    "179": {
+      "total": 3000
+    },
+    "181": {
+      "total": 70
+    },
+    "182": {
+      "total": 323
+    },
+    "186": {
+      "total": 758
+    },
+    "202": {
+      "total": 544
+    },
+    "204": {
+      "total": 90
+    },
+    "205": {
+      "total": 518
+    },
+    "208": {
+      "total": 251
+    },
+    "211": {
+      "total": 453
+    },
+    "213": {
+      "total": 108
+    },
+    "214": {
+      "total": 204
+    },
+    "216": {
+      "total": 55
+    },
+    "217": {
+      "total": 118
+    },
+    "218": {
+      "total": 55
+    },
+    "224": {
+      "total": 180
+    },
+    "226": {
+      "total": 136
+    },
+    "230": {
+      "total": 80
+    },
+    "231": {
+      "total": 149
+    },
+    "232": {
+      "total": 229
+    },
+    "233": {
+      "total": 344
+    },
+    "235": {
+      "total": 209
+    },
+    "236": {
+      "total": 125
+    },
+    "239": {
+      "total": 80
+    },
+    "240": {
+      "total": 382
+    },
+    "241": {
+      "total": 229
+    },
+    "244": {
+      "total": 343
+    },
+    "245": {
+      "total": 639
+    },
+    "249": {
+      "total": 246
+    },
+    "250": {
+      "total": 59
+    },
+    "256": {
+      "total": 55
+    },
+    "257": {
+      "total": 633
+    },
+    "260": {
+      "total": 268
+    },
+    "261": {
+      "total": 159
+    },
+    "263": {
+      "total": 187
+    },
+    "265": {
+      "total": 55
+    },
+    "271": {
+      "total": 166
+    },
+    "272": {
+      "total": 798
+    },
+    "273": {
+      "total": 97
+    },
+    "275": {
+      "total": 82
+    },
+    "276": {
+      "total": 306
+    },
+    "280": {
+      "total": 80
+    },
+    "284": {
+      "total": 80
+    },
+    "285": {
+      "total": 646
+    },
+    "286": {
+      "total": 1090
+    },
+    "287": {
+      "total": 154
+    },
+    "288": {
+      "total": 167
+    },
+    "290": {
+      "total": 170
+    },
+    "291": {
+      "total": 80
+    },
+    "295": {
+      "total": 20
+    },
+    "297": {
+      "total": 2500
+    },
+    "300": {
+      "total": 125
+    },
+    "301": {
+      "total": 365
+    },
+    "304": {
+      "total": 54
+    },
+    "305": {
+      "total": 301
+    },
+    "309": {
+      "total": 153
+    },
+    "312": {
+      "total": 55
+    },
+    "316": {
+      "total": 154
+    },
+    "317": {
+      "total": 96
+    },
+    "318": {
+      "total": 20
+    },
+    "320": {
+      "total": 168
+    },
+    "322": {
+      "total": 141
+    },
+    "398": {
+      "total": 2000
+    },
+    "399": {
+      "total": 164
+    },
+    "400": {
+      "total": 186
+    },
+    "402": {
+      "total": 254
+    },
+    "403": {
+      "total": 90
+    },
+    "405": {
+      "total": 950
+    },
+    "407": {
+      "total": 90
+    },
+    "408": {
+      "total": 306
+    },
+    "410": {
+      "total": 342
+    },
+    "416": {
+      "total": 101
+    },
+    "417": {
+      "total": 80
+    },
+    "418": {
+      "total": 331
+    },
+    "420": {
+      "total": 265
+    },
+    "421": {
+      "total": 37
+    },
+    "422": {
+      "total": 277
+    },
+    "423": {
+      "total": 344
+    },
+    "425": {
+      "total": 277
+    },
+    "426": {
+      "total": 225
+    },
+    "430": {
+      "total": 284
+    },
+    "433": {
+      "total": 177
+    },
+    "434": {
+      "total": 315
+    },
+    "435": {
+      "total": 37
+    },
+    "436": {
+      "total": 92
+    },
+    "438": {
+      "total": 31
+    },
+    "440": {
+      "total": 136
+    },
+    "441": {
+      "total": 168
+    },
+    "444": {
+      "total": 839
+    },
+    "445": {
+      "total": 259
+    },
+    "475": {
+      "total": 146
+    },
+    "478": {
+      "total": 241
+    },
+    "480": {
+      "total": 80
+    },
+    "481": {
+      "total": 261
+    },
+    "483": {
+      "total": 55
+    },
+    "484": {
+      "total": 101
+    },
+    "489": {
+      "total": 86
+    },
+    "491": {
+      "total": 575
+    },
+    "494": {
+      "total": 175
+    },
+    "495": {
+      "total": 55
+    },
+    "498": {
+      "total": 80
+    },
+    "499": {
+      "total": 388
+    },
+    "500": {
+      "total": 200
+    },
+    "503": {
+      "total": 225
+    },
+    "504": {
+      "total": 77
+    },
+    "505": {
+      "total": 346
+    },
+    "507": {
+      "total": 111
+    },
+    "508": {
+      "total": 205
+    },
+    "529": {
+      "total": 353
+    },
+    "531": {
+      "total": 115
+    },
+    "535": {
+      "total": 173
+    },
+    "536": {
+      "total": 508
+    },
+    "538": {
+      "total": 169
+    },
+    "541": {
+      "total": 156
+    },
+    "543": {
+      "total": 718
+    },
+    "545": {
+      "total": 202
+    },
+    "560": {
+      "total": 342
+    },
+    "561": {
+      "total": 55
+    },
+    "562": {
+      "total": 197
+    },
+    "563": {
+      "total": 149
+    },
+    "564": {
+      "total": 4000
+    },
+    "576": {
+      "total": 112
+    },
+    "577": {
+      "total": 239
+    },
+    "578": {
+      "total": 90
+    },
+    "580": {
+      "total": 158
+    },
+    "581": {
+      "total": 180
+    },
+    "583": {
+      "total": 47
+    },
+    "584": {
+      "total": 81
+    },
+    "592": {
+      "total": 119
+    },
+    "593": {
+      "total": 350
+    },
+    "595": {
+      "total": 119
+    },
+    "598": {
+      "total": 369
+    },
+    "599": {
+      "total": 218
+    },
+    "601": {
+      "total": 132
+    },
+    "604": {
+      "total": 339
+    },
+    "607": {
+      "total": 142
+    },
+    "608": {
+      "total": 80
+    },
+    "609": {
+      "total": 1177
+    },
+    "611": {
+      "total": 142
+    },
+    "614": {
+      "total": 115
+    },
+    "615": {
+      "total": 174
+    },
+    "616": {
+      "total": 74
+    },
+    "619": {
+      "total": 80
+    },
+    "620": {
+      "total": 82
+    },
+    "623": {
+      "total": 80
+    },
+    "624": {
+      "total": 123
+    },
+    "625": {
+      "total": 102
+    },
+    "626": {
+      "total": 116
+    },
+    "630": {
+      "total": 55
+    },
+    "631": {
+      "total": 93
+    },
+    "635": {
+      "total": 163
+    },
+    "636": {
+      "total": 206
+    },
+    "638": {
+      "total": 675
+    },
+    "678": {
+      "total": 454
+    },
+    "680": {
+      "total": 350
+    },
+    "681": {
+      "total": 111
+    },
+    "683": {
+      "total": 104
+    },
+    "684": {
+      "total": 588
+    },
+    "686": {
+      "total": 105
+    },
+    "687": {
+      "total": 55
+    },
+    "689": {
+      "total": 103
+    },
+    "691": {
+      "total": 97
+    },
+    "694": {
+      "total": 423
+    },
+    "697": {
+      "total": 55
+    },
+    "698": {
+      "total": 869
+    },
+    "700": {
+      "total": 127
+    },
+    "702": {
+      "total": 166
+    },
+    "704": {
+      "total": 157
+    },
+    "707": {
+      "total": 80
+    },
+    "710": {
+      "total": 411
+    },
+    "729": {
+      "total": 174
+    },
+    "732": {
+      "total": 105
+    },
+    "734": {
+      "total": 721
+    },
+    "736": {
+      "total": 70
+    },
+    "738": {
+      "total": 106
+    },
+    "739": {
+      "total": 95
+    },
+    "740": {
+      "total": 513
+    },
+    "742": {
+      "total": 55
+    },
+    "743": {
+      "total": 800
+    },
+    "746": {
+      "total": 158
+    },
+    "747": {
+      "total": 63
+    },
+    "748": {
+      "total": 137
+    },
+    "749": {
+      "total": 318
+    },
+    "751": {
+      "total": 101
+    },
+    "753": {
+      "total": 353
+    },
+    "755": {
+      "total": 130
+    },
+    "758": {
+      "total": 197
+    },
+    "759": {
+      "total": 80
+    },
+    "761": {
+      "total": 182
+    },
+    "762": {
+      "total": 136
+    },
+    "765": {
+      "total": 212
+    },
+    "766": {
+      "total": 8
+    },
+    "768": {
+      "total": 80
+    },
+    "771": {
+      "total": 55
+    },
+    "777": {
+      "total": 218
+    },
+    "778": {
+      "total": 158
+    },
+    "781": {
+      "total": 135
+    },
+    "783": {
+      "total": 137
+    },
+    "785": {
+      "total": 103
+    },
+    "790": {
+      "total": 373
+    },
+    "791": {
+      "total": 148
+    },
+    "831": {
+      "total": 139
+    },
+    "832": {
+      "total": 120
+    },
+    "833": {
+      "total": 76
+    },
+    "834": {
+      "total": 163
+    },
+    "837": {
+      "total": 5500
+    },
+    "844": {
+      "total": 61
+    },
+    "845": {
+      "total": 90
+    },
+    "846": {
+      "total": 111
+    },
+    "848": {
+      "total": 114
+    },
+    "849": {
+      "total": 105
+    },
+    "850": {
+      "total": 80
+    },
+    "851": {
+      "total": 301
+    },
+    "853": {
+      "total": 3500
+    },
+    "854": {
+      "total": 91
+    },
+    "857": {
+      "total": 84
+    },
+    "858": {
+      "total": 551
+    },
+    "859": {
+      "total": 163
+    },
+    "886": {
+      "total": 242
+    },
+    "887": {
+      "total": 170
+    },
+    "889": {
+      "total": 82
+    },
+    "890": {
+      "total": 55
+    },
+    "892": {
+      "total": 114
+    },
+    "893": {
+      "total": 174
+    },
+    "895": {
+      "total": 336
+    },
+    "905": {
+      "total": 819
+    },
+    "908": {
+      "total": 310
+    },
+    "915": {
+      "total": 384
+    },
+    "918": {
+      "total": 80
+    },
+    "921": {
+      "total": 80
+    },
+    "922": {
+      "total": 114
+    },
+    "924": {
+      "total": 113
+    },
+    "925": {
+      "total": 109
+    },
+    "927": {
+      "total": 492
+    },
+    "931": {
+      "total": 121
+    },
+    "934": {
+      "total": 89
+    },
+    "935": {
+      "total": 103
+    },
+    "936": {
+      "total": 138
+    },
+    "941": {
+      "total": 25
+    },
+    "946": {
+      "total": 130
+    },
+    "976": {
+      "total": 130
+    },
+    "977": {
+      "total": 311
+    },
+    "980": {
+      "total": 587
+    },
+    "981": {
+      "total": 80
+    },
+    "989": {
+      "total": 149
+    },
+    "992": {
+      "total": 326
+    },
+    "005": {
+      "total": 202
+    },
+    "009": {
+      "total": 88
+    },
+    "010": {
+      "total": 240
+    },
+    "016": {
+      "total": 153
+    },
+    "018": {
+      "total": 124
+    },
+    "019": {
+      "total": 101
+    },
+    "020": {
+      "total": 351
+    },
+    "035": {
+      "total": 35
+    },
+    "043": {
+      "total": 56
+    },
+    "046": {
+      "total": 57
+    },
+    "047": {
+      "total": 64
+    },
+    "049": {
+      "total": 5000
+    },
+    "050": {
+      "total": 204
+    },
+    "051": {
+      "total": 208
+    },
+    "052": {
+      "total": 87
+    },
+    "060": {
+      "total": 97
+    },
+    "061": {
+      "total": 285
+    },
+    "062": {
+      "total": 35
+    },
+    "065": {
+      "total": 35
+    },
+    "069": {
+      "total": 153
+    },
+    "071": {
+      "total": 136
+    },
+    "072": {
+      "total": 59
+    },
+    "074": {
+      "total": 55
+    },
+    "075": {
+      "total": 385
+    },
+    "076": {
+      "total": 55
+    },
+    "077": {
+      "total": 182
+    },
+    "078": {
+      "total": 240
+    },
+    "079": {
+      "total": 156
+    },
+    "081": {
+      "total": 91
+    },
+    "082": {
+      "total": 242
+    },
+    "086": {
+      "total": 180
+    },
+    "090": {
+      "total": 116
+    },
+    "091": {
+      "total": 12500
+    },
+    "092": {
+      "total": 3000
+    },
+    "097": {
+      "total": 80
+    },
+    "098": {
+      "total": 447
+    }
+  }
+}

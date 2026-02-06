@@ -73,27 +73,29 @@ export default function LayerCard({ layerKey, isVisible, onToggle, statusText, c
           </div>
         )}
 
-        {/* Toggle switch - completely separate from expand */}
-        <button
-          type="button"
-          onClick={() => onToggle(!isVisible)}
-          className={`toggle-switch relative w-10 h-6 rounded-full flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
-            isVisible
-              ? 'bg-green-500 hover:bg-green-600'
-              : isDark
-              ? 'bg-zinc-700 hover:bg-zinc-600'
-              : 'bg-zinc-300 hover:bg-zinc-400'
-          }`}
-          aria-label={`${info.label} ${isVisible ? 'pois' : 'päälle'}`}
-          aria-checked={isVisible}
-          role="switch"
-        >
-          <span
-            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-              isVisible ? 'translate-x-[18px]' : 'translate-x-0.5'
+        {/* Toggle switch - separate from expand, with 44px touch target */}
+        <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => onToggle(!isVisible)}
+            className={`toggle-switch relative w-10 h-6 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
+              isVisible
+                ? 'bg-green-500 hover:bg-green-600'
+                : isDark
+                ? 'bg-zinc-700 hover:bg-zinc-600'
+                : 'bg-zinc-300 hover:bg-zinc-400'
             }`}
-          />
-        </button>
+            aria-label={`${info.label} ${isVisible ? 'pois' : 'päälle'}`}
+            aria-checked={isVisible}
+            role="switch"
+          >
+            <span
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                isVisible ? 'translate-x-[18px]' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Expandable settings */}
