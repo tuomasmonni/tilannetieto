@@ -1,39 +1,12 @@
 /**
  * Rata.digitraffic.fi - Junaseuranta
- * Hakee reaaliaikaiset junasijainnit ja junatiedot
+ * Hakee reaaliaikaiset junasijainnit ja junatiedot GraphQL API:lla
  */
 
+const GRAPHQL_URL = 'https://rata.digitraffic.fi/api/v2/graphql/graphql';
 const TRAIN_LOCATIONS_URL = 'https://rata.digitraffic.fi/api/v1/train-locations/latest';
-const TRAINS_URL = 'https://rata.digitraffic.fi/api/v1/trains';
 
 export type TrainCategory = 'Long-distance' | 'Commuter' | 'Cargo' | 'Locomotive' | 'Shunting';
-
-export interface RataTrainLocation {
-  trainNumber: number;
-  departureDate: string;
-  timestamp: string;
-  location: {
-    type: 'Point';
-    coordinates: [number, number]; // [lon, lat]
-  };
-  speed: number;
-}
-
-export interface RataTrainInfo {
-  trainNumber: number;
-  departureDate: string;
-  trainType: string; // IC, S, PYO, HDM, MUS, etc.
-  trainCategory: TrainCategory;
-  commuterLineID?: string; // A, E, I, K, etc.
-  timetableRows: Array<{
-    stationShortCode: string;
-    type: 'ARRIVAL' | 'DEPARTURE';
-    scheduledTime: string;
-    liveEstimateTime?: string;
-    actualTime?: string;
-    differenceInMinutes?: number;
-  }>;
-}
 
 export interface TrainWithLocation {
   trainNumber: number;
@@ -48,14 +21,91 @@ export interface TrainWithLocation {
   timestamp: string;
 }
 
-function getToday(): string {
-  return new Date().toISOString().split('T')[0];
+const GRAPHQL_QUERY = `{
+  currentlyRunningTrains {
+    trainNumber
+    departureDate
+    commuterLineid
+    trainType { name trainCategory { name } }
+    trainLocations(orderBy: {timestamp: DESCENDING}, take: 1) {
+      speed timestamp location
+    }
+    timeTableRows(orderBy: {scheduledTime: DESCENDING}, take: 1) {
+      differenceInMinutes
+    }
+  }
+}`;
+
+interface GraphQLTrain {
+  trainNumber: number;
+  departureDate: string;
+  commuterLineid: string | null;
+  trainType: { name: string; trainCategory: { name: string } };
+  trainLocations: Array<{
+    speed: number;
+    timestamp: string;
+    location: [number, number]; // [lon, lat]
+  }>;
+  timeTableRows: Array<{
+    differenceInMinutes: number | null;
+  }>;
 }
 
 /**
- * Hakee viimeiset junasijainnit
+ * Hakee junadata GraphQL API:lla (41 KB vs 18 MB REST)
  */
-async function fetchTrainLocations(): Promise<RataTrainLocation[]> {
+async function fetchTrainDataGraphQL(): Promise<TrainWithLocation[]> {
+  const response = await fetch(GRAPHQL_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Digitraffic-User': 'tilannekuva.online/1.0',
+    },
+    body: JSON.stringify({ query: GRAPHQL_QUERY }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`GraphQL API error: ${response.status}`);
+  }
+
+  const json = await response.json();
+  const trains: GraphQLTrain[] = json.data?.currentlyRunningTrains ?? [];
+
+  const result: TrainWithLocation[] = [];
+
+  for (const train of trains) {
+    const category = train.trainType.trainCategory.name as TrainCategory;
+
+    // Suodata pois veturit ja vaihtotyöjunat
+    if (category === 'Locomotive' || category === 'Shunting') continue;
+
+    // Ohita junat ilman sijaintidataa
+    if (!train.trainLocations.length) continue;
+
+    const loc = train.trainLocations[0];
+
+    result.push({
+      trainNumber: train.trainNumber,
+      departureDate: train.departureDate,
+      trainType: train.trainType.name,
+      trainCategory: category,
+      commuterLineID: train.commuterLineid || undefined,
+      lon: loc.location[0],
+      lat: loc.location[1],
+      speed: loc.speed,
+      lateMinutes: train.timeTableRows[0]?.differenceInMinutes ?? 0,
+      timestamp: loc.timestamp,
+    });
+  }
+
+  console.log(`[Train] GraphQL: ${result.length} trains (from ${trains.length} running)`);
+  return result;
+}
+
+/**
+ * Fallback: hakee vain sijainnit REST API:lla (ilman viive/tyyppi-tietoja)
+ */
+async function fetchTrainLocationsOnly(): Promise<TrainWithLocation[]> {
   const response = await fetch(TRAIN_LOCATIONS_URL, {
     headers: {
       'Accept-Encoding': 'gzip',
@@ -67,82 +117,35 @@ async function fetchTrainLocations(): Promise<RataTrainLocation[]> {
     throw new Error(`Train locations API error: ${response.status}`);
   }
 
-  return response.json();
-}
-
-/**
- * Hakee junatiedot (tyyppi, viive)
- */
-async function fetchTrainInfo(): Promise<RataTrainInfo[]> {
-  const date = getToday();
-  const response = await fetch(`${TRAINS_URL}/${date}`, {
-    headers: {
-      'Accept-Encoding': 'gzip',
-      'Digitraffic-User': 'tilannekuva.online/1.0',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Train info API error: ${response.status}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Laske junan viive viimeisen timetableRow differenceInMinutes -kentästä
- */
-function calculateDelay(train: RataTrainInfo): number {
-  const rows = train.timetableRows;
-  for (let i = rows.length - 1; i >= 0; i--) {
-    if (rows[i].differenceInMinutes !== undefined) {
-      return rows[i].differenceInMinutes!;
-    }
-  }
-  return 0;
-}
-
-/**
- * Hakee ja yhdistää junadata: sijainti + tyyppi + viive
- */
-export async function fetchTrainData(): Promise<TrainWithLocation[]> {
-  const [locations, trainInfos] = await Promise.all([
-    fetchTrainLocations(),
-    fetchTrainInfo(),
-  ]);
-
-  // Luo lookup map junatiedoille
-  const trainInfoMap = new Map<string, RataTrainInfo>();
-  for (const train of trainInfos) {
-    trainInfoMap.set(`${train.trainNumber}-${train.departureDate}`, train);
-  }
-
+  const locations = await response.json();
   const result: TrainWithLocation[] = [];
 
   for (const loc of locations) {
-    const key = `${loc.trainNumber}-${loc.departureDate}`;
-    const info = trainInfoMap.get(key);
-
-    // Suodata pois junat joiden tietoja ei löydy
-    if (!info) continue;
-
-    // Suodata pois veturit ja vaihtotyöjunat
-    if (info.trainCategory === 'Locomotive' || info.trainCategory === 'Shunting') continue;
-
     result.push({
       trainNumber: loc.trainNumber,
       departureDate: loc.departureDate,
-      trainType: info.trainType,
-      trainCategory: info.trainCategory,
-      commuterLineID: info.commuterLineID,
+      trainType: 'Unknown',
+      trainCategory: 'Long-distance',
       lat: loc.location.coordinates[1],
       lon: loc.location.coordinates[0],
       speed: loc.speed,
-      lateMinutes: calculateDelay(info),
+      lateMinutes: 0,
       timestamp: loc.timestamp,
     });
   }
 
-  console.log(`[Train] ${result.length} trains with location (from ${locations.length} locations, ${trainInfos.length} trains)`);
+  console.log(`[Train] REST fallback: ${result.length} trains (no type/delay info)`);
   return result;
+}
+
+/**
+ * Hakee junadata: GraphQL ensin, fallback REST-lokaatioihin
+ */
+export async function fetchTrainData(): Promise<TrainWithLocation[]> {
+  try {
+    return await fetchTrainDataGraphQL();
+  } catch (error) {
+    console.warn('[Train] GraphQL failed, trying REST fallback:', error);
+    return await fetchTrainLocationsOnly();
+  }
 }
