@@ -11,7 +11,7 @@ import type { EventCategory } from './constants';
 
 export interface NormalizedEvent {
   id: string;
-  type: 'traffic' | 'roadwork' | 'train' | 'camera' | 'news' | 'weather' | 'transit' | 'road_weather';
+  type: 'traffic' | 'roadwork' | 'train' | 'camera' | 'news' | 'weather' | 'transit' | 'road_weather' | 'snow';
   category: EventCategory;
   title: string;
   description: string;
@@ -100,6 +100,19 @@ export interface TrainLocation {
   };
   speed: number;
   accuracy?: number;
+}
+
+// ============================================
+// LUMITILANNE - SNOW OBSERVATION TYYPIT
+// ============================================
+
+export interface SnowObservation {
+  stationId: string;
+  stationName: string;
+  lat: number;
+  lon: number;
+  snowDepth: number | null;
+  timestamp: string;
 }
 
 // ============================================

@@ -9,6 +9,9 @@ import TrafficSettings from './settings/TrafficSettings';
 import TransitSettings from './settings/TransitSettings';
 import CrimeSettings from './settings/CrimeSettings';
 import NewsSettings from './settings/NewsSettings';
+import TrainSettings from './settings/TrainSettings';
+import ElectionSettings from './settings/ElectionSettings';
+import AssociationsSettings from './settings/AssociationsSettings';
 
 interface CategorySheetProps {
   group: LayerGroupKey | null;
@@ -25,6 +28,10 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     transit,
     crime,
     news,
+    train,
+    snow,
+    election,
+    associations,
     setWeatherLayerVisible,
     setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
@@ -32,6 +39,10 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     setTransitLayerVisible,
     setCrimeLayerVisible,
     setNewsLayerVisible,
+    setTrainLayerVisible,
+    setSnowLayerVisible,
+    setElectionLayerVisible,
+    setAssociationsLayerVisible,
   } = useUnifiedFilters();
 
   const isDark = theme === 'dark';
@@ -48,11 +59,17 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     transit: { visible: transit.layerVisible, toggle: setTransitLayerVisible },
     crime: { visible: crime.layerVisible, toggle: setCrimeLayerVisible },
     news: { visible: news.layerVisible, toggle: setNewsLayerVisible },
+    train: { visible: train.layerVisible, toggle: setTrainLayerVisible },
+    snow: { visible: snow.layerVisible, toggle: setSnowLayerVisible },
+    election: { visible: election.layerVisible, toggle: setElectionLayerVisible },
+    associations: { visible: associations.layerVisible, toggle: setAssociationsLayerVisible },
   }), [
     weather.layerVisible, roadWeather.layerVisible, weatherCamera.layerVisible,
     traffic.layerVisible, transit.layerVisible, crime.layerVisible, news.layerVisible,
+    train.layerVisible, snow.layerVisible, election.layerVisible, associations.layerVisible,
     setWeatherLayerVisible, setRoadWeatherLayerVisible, setWeatherCameraLayerVisible,
     setTrafficLayerVisible, setTransitLayerVisible, setCrimeLayerVisible, setNewsLayerVisible,
+    setTrainLayerVisible, setSnowLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
   ]);
 
   const layerSettings: Record<string, React.ReactNode> = {
@@ -61,6 +78,9 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     transit: <TransitSettings />,
     crime: <CrimeSettings />,
     news: <NewsSettings />,
+    train: <TrainSettings />,
+    election: <ElectionSettings />,
+    associations: <AssociationsSettings />,
   };
 
   const closeSheet = useCallback(() => {

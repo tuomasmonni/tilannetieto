@@ -13,6 +13,9 @@ import TrafficSettings from './settings/TrafficSettings';
 import TransitSettings from './settings/TransitSettings';
 import CrimeSettings from './settings/CrimeSettings';
 import NewsSettings from './settings/NewsSettings';
+import TrainSettings from './settings/TrainSettings';
+import ElectionSettings from './settings/ElectionSettings';
+import AssociationsSettings from './settings/AssociationsSettings';
 
 const GROUP_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'statistics', 'media'];
 
@@ -30,6 +33,10 @@ export default function Sidebar() {
     transit,
     crime,
     news,
+    train,
+    snow,
+    election,
+    associations,
     setWeatherLayerVisible,
     setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
@@ -37,6 +44,10 @@ export default function Sidebar() {
     setTransitLayerVisible,
     setCrimeLayerVisible,
     setNewsLayerVisible,
+    setTrainLayerVisible,
+    setSnowLayerVisible,
+    setElectionLayerVisible,
+    setAssociationsLayerVisible,
     getActiveLayerCount,
   } = useUnifiedFilters();
 
@@ -51,11 +62,17 @@ export default function Sidebar() {
     transit: { visible: transit.layerVisible, toggle: setTransitLayerVisible },
     crime: { visible: crime.layerVisible, toggle: setCrimeLayerVisible },
     news: { visible: news.layerVisible, toggle: setNewsLayerVisible },
+    train: { visible: train.layerVisible, toggle: setTrainLayerVisible },
+    snow: { visible: snow.layerVisible, toggle: setSnowLayerVisible },
+    election: { visible: election.layerVisible, toggle: setElectionLayerVisible },
+    associations: { visible: associations.layerVisible, toggle: setAssociationsLayerVisible },
   }), [
     weather.layerVisible, roadWeather.layerVisible, weatherCamera.layerVisible,
     traffic.layerVisible, transit.layerVisible, crime.layerVisible, news.layerVisible,
+    train.layerVisible, snow.layerVisible, election.layerVisible, associations.layerVisible,
     setWeatherLayerVisible, setRoadWeatherLayerVisible, setWeatherCameraLayerVisible,
     setTrafficLayerVisible, setTransitLayerVisible, setCrimeLayerVisible, setNewsLayerVisible,
+    setTrainLayerVisible, setSnowLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
   ]);
 
   // Settings components map
@@ -65,6 +82,9 @@ export default function Sidebar() {
     transit: <TransitSettings />,
     crime: <CrimeSettings />,
     news: <NewsSettings />,
+    train: <TrainSettings />,
+    election: <ElectionSettings />,
+    associations: <AssociationsSettings />,
   };
 
   // Filter layers by search query

@@ -30,6 +30,7 @@ export { CRIME_CATEGORIES, AVAILABLE_YEARS };
 // ============================================
 
 export type TransitVehicleType = 'bus' | 'tram' | 'metro' | 'train';
+export type TrainType = 'IC' | 'S' | 'Pendolino' | 'commuter' | 'cargo';
 export type WeatherMetric = 'temperature' | 'wind' | 'precipitation';
 
 interface UnifiedFilterState {
@@ -81,6 +82,29 @@ interface UnifiedFilterState {
     searchQuery: string;
   };
 
+  // Junaseuranta (rata.digitraffic.fi)
+  train: {
+    layerVisible: boolean;
+    trainTypes: TrainType[];
+  };
+
+  // Lumitilanne (FMI)
+  snow: {
+    layerVisible: boolean;
+  };
+
+  // Eduskuntavaalit
+  election: {
+    year: string;
+    layerVisible: boolean;
+  };
+
+  // Yhdistykset (PRH)
+  associations: {
+    layerVisible: boolean;
+    displayMode: 'count' | 'perCapita';
+  };
+
   // Yleiset asetukset
   theme: MapTheme;
 
@@ -127,6 +151,21 @@ interface UnifiedFilterActions {
   toggleNewsSource: (source: NewsSourceKey) => void;
   toggleNewsCategory: (category: NewsCategoryKey) => void;
   setNewsSearchQuery: (query: string) => void;
+
+  // Train actions
+  setTrainLayerVisible: (visible: boolean) => void;
+  toggleTrainType: (type: TrainType) => void;
+
+  // Snow actions
+  setSnowLayerVisible: (visible: boolean) => void;
+
+  // Election actions
+  setElectionYear: (year: string) => void;
+  setElectionLayerVisible: (visible: boolean) => void;
+
+  // Associations actions
+  setAssociationsLayerVisible: (visible: boolean) => void;
+  setAssociationsDisplayMode: (mode: 'count' | 'perCapita') => void;
 
   // General actions
   setTheme: (theme: MapTheme) => void;
@@ -175,6 +214,21 @@ const DEFAULT_STATE: UnifiedFilterState = {
     sources: ['yle', 'iltalehti', 'mtv'],
     categories: ['liikenne', 'rikos', 'politiikka', 'terveys', 'ymparisto', 'talous', 'urheilu', 'onnettomuus', 'muu'],
     searchQuery: '',
+  },
+  train: {
+    layerVisible: false,
+    trainTypes: ['IC', 'S', 'Pendolino', 'commuter'],
+  },
+  snow: {
+    layerVisible: false,
+  },
+  election: {
+    year: '2023',
+    layerVisible: false,
+  },
+  associations: {
+    layerVisible: false,
+    displayMode: 'count',
   },
   theme: 'dark',
   activeGroup: null,
@@ -509,6 +563,69 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     }));
   }, []);
 
+  // ========== TRAIN ACTIONS ==========
+
+  const setTrainLayerVisible = useCallback((visible: boolean) => {
+    toggleLayerWithGroup('train', visible, prev => ({
+      ...prev,
+      train: { ...prev.train, layerVisible: visible },
+    }));
+  }, [toggleLayerWithGroup]);
+
+  const toggleTrainType = useCallback((type: TrainType) => {
+    setState(prev => {
+      const types = prev.train.trainTypes;
+      const newTypes = types.includes(type)
+        ? types.filter(t => t !== type)
+        : [...types, type];
+      return {
+        ...prev,
+        train: { ...prev.train, trainTypes: newTypes },
+      };
+    });
+  }, []);
+
+  // ========== SNOW ACTIONS ==========
+
+  const setSnowLayerVisible = useCallback((visible: boolean) => {
+    toggleLayerWithGroup('snow', visible, prev => ({
+      ...prev,
+      snow: { ...prev.snow, layerVisible: visible },
+    }));
+  }, [toggleLayerWithGroup]);
+
+  // ========== ELECTION ACTIONS ==========
+
+  const setElectionYear = useCallback((year: string) => {
+    setState(prev => ({
+      ...prev,
+      election: { ...prev.election, year },
+    }));
+  }, []);
+
+  const setElectionLayerVisible = useCallback((visible: boolean) => {
+    toggleLayerWithGroup('election', visible, prev => ({
+      ...prev,
+      election: { ...prev.election, layerVisible: visible },
+    }));
+  }, [toggleLayerWithGroup]);
+
+  // ========== ASSOCIATIONS ACTIONS ==========
+
+  const setAssociationsLayerVisible = useCallback((visible: boolean) => {
+    toggleLayerWithGroup('associations', visible, prev => ({
+      ...prev,
+      associations: { ...prev.associations, layerVisible: visible },
+    }));
+  }, [toggleLayerWithGroup]);
+
+  const setAssociationsDisplayMode = useCallback((mode: 'count' | 'perCapita') => {
+    setState(prev => ({
+      ...prev,
+      associations: { ...prev.associations, displayMode: mode },
+    }));
+  }, []);
+
   // ========== GENERAL ACTIONS ==========
 
   const setTheme = useCallback((theme: MapTheme) => {
@@ -544,6 +661,13 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     toggleNewsSource,
     toggleNewsCategory,
     setNewsSearchQuery,
+    setTrainLayerVisible,
+    toggleTrainType,
+    setSnowLayerVisible,
+    setElectionYear,
+    setElectionLayerVisible,
+    setAssociationsLayerVisible,
+    setAssociationsDisplayMode,
     setTheme,
     resetFilters,
     setActiveGroup,

@@ -90,6 +90,12 @@ export const EVENT_CATEGORIES = {
     label: 'Ties\u00e4\u00e4',
     emoji: '\u{1F321}\uFE0F',
   },
+  snow: {
+    color: '#a5f3fc',
+    icon: 'snowflake',
+    label: 'Lumitilanne',
+    emoji: '\u2744\uFE0F',
+  },
 } as const;
 
 export type EventCategory = keyof typeof EVENT_CATEGORIES;
@@ -126,6 +132,7 @@ export const POLLING_INTERVALS = {
   transit: 15_000,    // 15 sec (HSL GTFS-RT)
   roadWeather: 300_000, // 5 min (Digitraffic)
   news: 900_000,      // 15 min (RSS feeds)
+  snow: 300_000,      // 5 min (FMI lumensyvyys)
 } as const;
 
 export const API_ENDPOINTS = {
@@ -174,7 +181,7 @@ export type NewsSourceKey = keyof typeof NEWS_SOURCES;
 // LAYER GROUPS (Category Navigator)
 // ============================================
 
-export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'traffic' | 'transit' | 'crime' | 'news';
+export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations';
 export type LayerGroupKey = 'weather' | 'traffic' | 'statistics' | 'media';
 
 export interface LayerGroupConfig {
@@ -191,21 +198,21 @@ export const LAYER_GROUPS: Record<LayerGroupKey, LayerGroupConfig> = {
     icon: '☀️',
     color: '#06b6d4',
     tailwindColor: 'group-weather',
-    layers: ['weather', 'roadWeather', 'weatherCamera'],
+    layers: ['weather', 'roadWeather', 'weatherCamera', 'snow'],
   },
   traffic: {
     label: 'Liikenne',
     icon: '🚗',
     color: '#f97316',
     tailwindColor: 'group-traffic',
-    layers: ['traffic', 'transit'],
+    layers: ['traffic', 'transit', 'train'],
   },
   statistics: {
     label: 'Tilastot',
     icon: '📊',
     color: '#3b82f6',
     tailwindColor: 'group-statistics',
-    layers: ['crime'],
+    layers: ['crime', 'election', 'associations'],
   },
   media: {
     label: 'Media',
@@ -224,4 +231,8 @@ export const LAYER_INFO: Record<LayerKey, { label: string; icon: string; descrip
   transit: { label: 'Joukkoliikenne', icon: '🚌', description: 'HSL-alueen liikenne' },
   crime: { label: 'Rikostilastot', icon: '📈', description: 'Tilastokeskus ICCS' },
   news: { label: 'Uutiset', icon: '📰', description: 'YLE, IL, MTV' },
+  train: { label: 'Junat', icon: '🚆', description: 'Reaaliaikaiset junasijainnit' },
+  snow: { label: 'Lumitilanne', icon: '❄️', description: 'FMI lumensyvyys' },
+  election: { label: 'Eduskuntavaalit', icon: '🏛️', description: 'Vaalitulokset kunnittain' },
+  associations: { label: 'Yhdistykset', icon: '🤝', description: 'Rekisteröidyt yhdistykset' },
 } as const;

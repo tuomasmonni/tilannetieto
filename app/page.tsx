@@ -50,6 +50,26 @@ const NewsLayer = dynamic(
   { ssr: false }
 );
 
+const ElectionLayer = dynamic(
+  () => import('@/components/map/layers/ElectionLayer'),
+  { ssr: false }
+);
+
+const AssociationsLayer = dynamic(
+  () => import('@/components/map/layers/AssociationsLayer'),
+  { ssr: false }
+);
+
+const TrainLayer = dynamic(
+  () => import('@/components/map/layers/TrainLayer'),
+  { ssr: false }
+);
+
+const SnowLayer = dynamic(
+  () => import('@/components/map/layers/SnowLayer'),
+  { ssr: false }
+);
+
 const WeatherCameraModal = dynamic(
   () => import('@/components/ui/WeatherCameraModal'),
   { ssr: false }
@@ -109,6 +129,10 @@ function AppContent() {
             <TransitLayer map={map} onEventSelect={handleEventSelect} />
             <RoadWeatherLayer map={map} onEventSelect={handleEventSelect} />
             <NewsLayer map={map} onEventSelect={handleEventSelect} />
+            <TrainLayer map={map} onEventSelect={handleEventSelect} />
+            <SnowLayer map={map} onEventSelect={handleEventSelect} />
+            <ElectionLayer map={map} />
+            <AssociationsLayer map={map} />
           </>
         )}
       </MapContainer>
@@ -140,7 +164,7 @@ function AppContent() {
           : 'bg-white/90 text-zinc-600 border-zinc-200'
       }`}>
         <p className={`font-medium ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-900'}`}>Tietolähteet</p>
-        <p>YLE, IL, MTV + Tilastokeskus + Fintraffic</p>
+        <p>YLE, IL, MTV + Tilastokeskus + Fintraffic + FMI</p>
         <p className={`mt-1 text-zinc-500`}>Päivittyy automaattisesti</p>
       </div>
 

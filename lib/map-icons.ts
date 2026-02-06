@@ -150,6 +150,20 @@ export const thermometerIcon = `
 </svg>
 `;
 
+// Lumihiutale - syaani ympyrä lumihiutaleella
+export const snowflakeIcon = `
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <circle cx="20" cy="20" r="16" fill="#a5f3fc" stroke="#ffffff" stroke-width="2" filter="url(#shadow)"/>
+  <path d="M20 8v24M8 20h24M12 12l16 16M28 12L12 28" stroke="#0e7490" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="20" cy="20" r="3" fill="#0e7490"/>
+</svg>
+`;
+
 // Oletus - harmaa ympyrä
 export const defaultIcon = `
 <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
@@ -175,6 +189,7 @@ export const mapIcons: Record<string, string> = {
   fire: fireIcon,
   bus: busIcon,
   thermometer: thermometerIcon,
+  snowflake: snowflakeIcon,
   default: defaultIcon,
 };
 
