@@ -164,6 +164,15 @@ export const snowflakeIcon = `
 </svg>
 `;
 
+// Hot Lips
+export const hotlipsIcon = `
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="shadow-hl" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.4"/></filter></defs>
+  <circle cx="20" cy="20" r="16" fill="#e53935" stroke="#ffffff" stroke-width="2" filter="url(#shadow-hl)"/>
+  <path d="M20 30c-5-4-8-7-8-11 0-3 2-5 4-5 1.5 0 3 1 4 2.5C21 15 22.5 14 24 14c2 0 4 2 4 5 0 4-3 7-8 11z" fill="white"/>
+</svg>
+`;
+
 // Oletus - harmaa ympyrä
 export const defaultIcon = `
 <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
@@ -190,6 +199,7 @@ export const mapIcons: Record<string, string> = {
   bus: busIcon,
   thermometer: thermometerIcon,
   snowflake: snowflakeIcon,
+  hotlips: hotlipsIcon,
   default: defaultIcon,
 };
 

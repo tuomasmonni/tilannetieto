@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.0564,
+          60.2058
+        ]
+      },
+      "properties": {
+        "id": "hotlips-helsinki",
+        "name": "Hot Lips Helsinki",
+        "address": "Asiakkaankatu 5, 00930 Helsinki",
+        "phone": "045-174 9122",
+        "schedule": "ma-la 11-19, su suljettu"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.6558,
+          60.9827
+        ]
+      },
+      "properties": {
+        "id": "hotlips-lahti",
+        "name": "Hot Lips Lahti",
+        "address": "Hämeenkatu 7, 15110 Lahti",
+        "phone": "040-354 3700",
+        "schedule": "ma-la 11-19, su suljettu"
+      }
+    }
+  ]
+}

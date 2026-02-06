@@ -22,7 +22,7 @@ import HousingSettings from './settings/HousingSettings';
 import PopulationSettings from './settings/PopulationSettings';
 import HealthSettings from './settings/HealthSettings';
 
-const GROUP_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'energy', 'statistics', 'health', 'media'];
+const GROUP_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'energy', 'statistics', 'health', 'media', 'services'];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -47,6 +47,7 @@ export default function Sidebar() {
     housing,
     population,
     health,
+    hotLips,
     setWeatherLayerVisible,
     setRoadWeatherLayerVisible,
     setWeatherCameraLayerVisible,
@@ -63,6 +64,7 @@ export default function Sidebar() {
     setHousingLayerVisible,
     setPopulationLayerVisible,
     setHealthLayerVisible,
+    setHotLipsLayerVisible,
     getActiveLayerCount,
   } = useUnifiedFilters();
 
@@ -86,15 +88,18 @@ export default function Sidebar() {
     housing: { visible: housing.layerVisible, toggle: setHousingLayerVisible },
     population: { visible: population.layerVisible, toggle: setPopulationLayerVisible },
     health: { visible: health.layerVisible, toggle: setHealthLayerVisible },
+    hotLips: { visible: hotLips.layerVisible, toggle: setHotLipsLayerVisible },
   }), [
     weather.layerVisible, roadWeather.layerVisible, weatherCamera.layerVisible,
     traffic.layerVisible, transit.layerVisible, crime.layerVisible, news.layerVisible,
     train.layerVisible, snow.layerVisible, election.layerVisible, associations.layerVisible,
     energy.layerVisible, unemployment.layerVisible, housing.layerVisible, population.layerVisible, health.layerVisible,
+    hotLips.layerVisible,
     setWeatherLayerVisible, setRoadWeatherLayerVisible, setWeatherCameraLayerVisible,
     setTrafficLayerVisible, setTransitLayerVisible, setCrimeLayerVisible, setNewsLayerVisible,
     setTrainLayerVisible, setSnowLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
     setEnergyLayerVisible, setUnemploymentLayerVisible, setHousingLayerVisible, setPopulationLayerVisible, setHealthLayerVisible,
+    setHotLipsLayerVisible,
   ]);
 
   // Settings components map

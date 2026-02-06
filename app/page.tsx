@@ -90,6 +90,11 @@ const HealthLayer = dynamic(
   { ssr: false }
 );
 
+const HotLipsLayer = dynamic(
+  () => import('@/components/map/layers/HotLipsLayer'),
+  { ssr: false }
+);
+
 const WeatherCameraModal = dynamic(
   () => import('@/components/ui/WeatherCameraModal'),
   { ssr: false }
@@ -168,6 +173,7 @@ function AppContent() {
             <HousingLayer map={map} />
             <PopulationLayer map={map} />
             <HealthLayer map={map} />
+            <HotLipsLayer map={map} />
           </>
         )}
       </MapContainer>
