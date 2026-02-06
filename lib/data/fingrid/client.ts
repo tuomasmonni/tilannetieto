@@ -9,7 +9,8 @@
 const FINGRID_API_BASE = 'https://data.fingrid.fi/api';
 
 export interface FingridDataPoint {
-  timestamp: string;
+  startTime: string;
+  endTime: string;
   value: number;
   datasetId: number;
 }
@@ -71,7 +72,7 @@ export async function fetchLatestDatapoint(
     sortOrder: 'desc',
   });
 
-  const url = `${FINGRID_API_BASE}/${datasetId}?${params}`;
+  const url = `${FINGRID_API_BASE}/datasets/${datasetId}/data?${params}`;
 
   const response = await fetch(url, {
     headers: {
@@ -107,7 +108,7 @@ export async function fetchEnergyOverview(apiKey: string): Promise<EnergyOvervie
   const results = await Promise.allSettled(
     Object.entries(datasetIds).map(async ([key, id]) => {
       const point = await fetchLatestDatapoint(id, apiKey);
-      return { key, value: point?.value ?? 0, timestamp: point?.timestamp ?? '' };
+      return { key, value: point?.value ?? 0, timestamp: point?.startTime ?? '' };
     })
   );
 
