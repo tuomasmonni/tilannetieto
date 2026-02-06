@@ -5,6 +5,7 @@ import type mapboxgl from 'mapbox-gl';
 import { fetchCrimeMapData } from '@/lib/data/crime';
 import type { CrimeMapGeoJSON } from '@/lib/data/crime/api';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
+import CrimeMunicipalityDetail from '@/components/ui/CrimeMunicipalityDetail';
 
 interface CrimeLayerProps {
   map: mapboxgl.Map | null;
@@ -38,6 +39,13 @@ export function CrimeLayer({ map }: CrimeLayerProps) {
   const [error, setError] = useState<string | null>(null);
   const popupRef = useRef<mapboxgl.Popup | null>(null);
   const hoveredStateId = useRef<string | null>(null);
+  const [selectedMunicipality, setSelectedMunicipality] = useState<{
+    name: string;
+    year: number;
+    breakdown: Record<string, number>;
+    population?: number;
+    screenPosition?: { x: number; y: number };
+  } | null>(null);
 
   // Debounce filtterit 300ms viiveellä (displayMode EI debouncea - instant feedback)
   const debouncedYear = useDebounce(year, 300);
@@ -251,12 +259,44 @@ export function CrimeLayer({ map }: CrimeLayerProps) {
       map.getCanvas().style.cursor = '';
     };
 
+    const onClick = (e: any) => {
+      if (!e.features || e.features.length === 0) return;
+      const props = e.features[0].properties;
+
+      let breakdown: Record<string, number> = {};
+      if (props.crimeBreakdown) {
+        try {
+          breakdown = typeof props.crimeBreakdown === 'string'
+            ? JSON.parse(props.crimeBreakdown)
+            : props.crimeBreakdown;
+        } catch { /* ignore */ }
+      }
+
+      // Fallback: if no breakdown data, show at least the total
+      if (Object.keys(breakdown).length === 0) {
+        breakdown = { SSS: props.totalCrimes || 0 };
+      }
+
+      setSelectedMunicipality({
+        name: props.nimi || 'Tuntematon',
+        year: props.year || parseInt(year),
+        breakdown,
+        population: props.population,
+        screenPosition: { x: e.point.x, y: e.point.y },
+      });
+
+      // Remove hover tooltip when clicking
+      popup.remove();
+    };
+
     map.on('mousemove', 'crime-fill', onMouseMove);
     map.on('mouseleave', 'crime-fill', onMouseLeave);
+    map.on('click', 'crime-fill', onClick);
 
     return () => {
       map.off('mousemove', 'crime-fill', onMouseMove);
       map.off('mouseleave', 'crime-fill', onMouseLeave);
+      map.off('click', 'crime-fill', onClick);
       popup.remove();
     };
   }, [map, loaded, year, displayMode]);
@@ -282,7 +322,18 @@ export function CrimeLayer({ map }: CrimeLayerProps) {
     console.error('CrimeLayer error:', error);
   }
 
-  return null;
+  if (!selectedMunicipality) return null;
+
+  return (
+    <CrimeMunicipalityDetail
+      municipalityName={selectedMunicipality.name}
+      year={selectedMunicipality.year}
+      breakdown={selectedMunicipality.breakdown}
+      population={selectedMunicipality.population}
+      screenPosition={selectedMunicipality.screenPosition}
+      onClose={() => setSelectedMunicipality(null)}
+    />
+  );
 }
 
 export default CrimeLayer;

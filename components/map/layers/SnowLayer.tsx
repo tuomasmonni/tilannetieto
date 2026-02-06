@@ -123,7 +123,7 @@ export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
             'circle-color': [
               'interpolate',
               ['linear'],
-              ['to-number', ['get', 'snowDepth', ['object', ['get', 'metadata']]], 0],
+              ['to-number', ['get', 'snowDepth'], 0],
               0, '#8B4513',    // ruskea
               10, '#D2B48C',   // beige
               30, '#E8E8E8',   // vaaleanharmaa
@@ -147,7 +147,7 @@ export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
           source: SOURCE_ID,
           filter: ['!', ['has', 'point_count']],
           layout: {
-            'text-field': ['concat', ['get', 'snowDepth', ['object', ['get', 'metadata']]], ' cm'],
+            'text-field': ['concat', ['to-string', ['get', 'snowDepth']], ' cm'],
             'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
             'text-size': 10,
             'text-offset': [0, 0],

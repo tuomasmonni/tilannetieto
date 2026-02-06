@@ -54,6 +54,7 @@ export function ElectionLayer({ map }: ElectionLayerProps) {
         const existingSource = map.getSource('election-municipalities') as mapboxgl.GeoJSONSource;
         if (existingSource) {
           existingSource.setData(data);
+          setLoaded(true);
           return;
         }
 
@@ -117,15 +118,6 @@ export function ElectionLayer({ map }: ElectionLayerProps) {
       map.once('load', addLayer);
     }
   }, [map, data]);
-
-  // Päivitä data
-  useEffect(() => {
-    if (!map || !data || !loaded) return;
-    const source = map.getSource('election-municipalities') as mapboxgl.GeoJSONSource;
-    if (source) {
-      source.setData(data);
-    }
-  }, [map, data, loaded]);
 
   // Hover + tooltip
   useEffect(() => {

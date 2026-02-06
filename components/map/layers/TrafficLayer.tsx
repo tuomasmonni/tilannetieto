@@ -275,9 +275,9 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
     };
   }, [map, onEventSelect]);
 
-  // Time range change
+  // Time range change + re-fetch when toggled visible with no data
   useEffect(() => {
-    if (!map || !fetchDataRef.current) return;
+    if (!map || !fetchDataRef.current || !traffic?.layerVisible) return;
     fetchDataRef.current(traffic?.timeRange || 'all');
   }, [map, traffic?.timeRange, traffic?.layerVisible]);
 

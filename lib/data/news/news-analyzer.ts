@@ -55,6 +55,29 @@ function fallbackCategorize(title: string, summary: string): NewsCategory[] {
   return scores.slice(0, 2).map(([cat]) => cat);
 }
 
+// Yleisimpien kaupunkien erikoistaivutukset joita ei voi johtaa perusmuodosta
+const SPECIAL_INFLECTIONS: Record<string, string> = {
+  'Helsingissä': 'Helsinki', 'Helsinkiin': 'Helsinki', 'Helsingistä': 'Helsinki', 'Helsingin': 'Helsinki',
+  'Tampereella': 'Tampere', 'Tampereelle': 'Tampere', 'Tampereelta': 'Tampere', 'Tampereen': 'Tampere',
+  'Turussa': 'Turku', 'Turkuun': 'Turku', 'Turusta': 'Turku', 'Turun': 'Turku',
+  'Oulussa': 'Oulu', 'Ouluun': 'Oulu', 'Oulusta': 'Oulu', 'Oulun': 'Oulu',
+  'Jyväskylässä': 'Jyväskylä', 'Jyväskylään': 'Jyväskylä', 'Jyväskylästä': 'Jyväskylä', 'Jyväskylän': 'Jyväskylä',
+  'Kuopiossa': 'Kuopio', 'Kuopioon': 'Kuopio', 'Kuopiosta': 'Kuopio', 'Kuopion': 'Kuopio',
+  'Lahdessa': 'Lahti', 'Lahteen': 'Lahti', 'Lahdesta': 'Lahti', 'Lahden': 'Lahti',
+  'Porissa': 'Pori', 'Poriin': 'Pori', 'Porista': 'Pori', 'Porin': 'Pori',
+  'Joensuussa': 'Joensuu', 'Joensuuhun': 'Joensuu', 'Joensuusta': 'Joensuu', 'Joensuun': 'Joensuu',
+  'Lappeenrannassa': 'Lappeenranta', 'Lappeenrantaan': 'Lappeenranta', 'Lappeenrannasta': 'Lappeenranta', 'Lappeenrannan': 'Lappeenranta',
+  'Vaasassa': 'Vaasa', 'Vaasaan': 'Vaasa', 'Vaasasta': 'Vaasa', 'Vaasan': 'Vaasa',
+  'Kotkassa': 'Kotka', 'Kotkaan': 'Kotka', 'Kotkasta': 'Kotka', 'Kotkan': 'Kotka',
+  'Mikkelissä': 'Mikkeli', 'Mikkeliin': 'Mikkeli', 'Mikkelistä': 'Mikkeli', 'Mikkelin': 'Mikkeli',
+  'Seinäjoella': 'Seinäjoki', 'Seinäjoelle': 'Seinäjoki', 'Seinäjoelta': 'Seinäjoki', 'Seinäjoen': 'Seinäjoki',
+  'Rovaniemellä': 'Rovaniemi', 'Rovaniemelle': 'Rovaniemi', 'Rovaniemeltä': 'Rovaniemi', 'Rovaniemen': 'Rovaniemi',
+  'Kouvola': 'Kouvola', 'Kouvolassa': 'Kouvola', 'Kouvolaan': 'Kouvola', 'Kouvolasta': 'Kouvola', 'Kouvolan': 'Kouvola',
+  'Hämeenlinnassa': 'Hämeenlinna', 'Hämeenlinnaan': 'Hämeenlinna', 'Hämeenlinnasta': 'Hämeenlinna', 'Hämeenlinnan': 'Hämeenlinna',
+  'Salossa': 'Salo', 'Saloon': 'Salo', 'Salosta': 'Salo', 'Salon': 'Salo',
+  'Raahessa': 'Raahe', 'Raaheen': 'Raahe', 'Raahesta': 'Raahe', 'Raahen': 'Raahe',
+};
+
 function fallbackFindMunicipality(
   title: string,
   summary: string,
@@ -62,18 +85,26 @@ function fallbackFindMunicipality(
 ): { name: string; lat: number; lng: number } | null {
   const text = `${title} ${summary}`;
 
+  // 1. Tarkista erikoistaivutukset ensin (esim. "Helsingissä" → Helsinki)
+  for (const [inflected, baseName] of Object.entries(SPECIAL_INFLECTIONS)) {
+    if (text.includes(inflected)) {
+      const muni = municipalities.find(m => m.name === baseName);
+      if (muni) return muni;
+    }
+  }
+
   // Common Finnish suffixes for municipality names
-  const suffixes = ['ssa', 'ss\u00e4', 'lla', 'll\u00e4', 'n', 'sta', 'st\u00e4', 'lta', 'lt\u00e4', 'lle', 'seen'];
+  const suffixes = ['ssa', 'ssä', 'lla', 'llä', 'n', 'sta', 'stä', 'lta', 'ltä', 'lle', 'seen', 'hun', 'hin'];
 
   for (const muni of municipalities) {
     // Exact match
     if (text.includes(muni.name)) return muni;
 
-    // Match with suffixes (e.g., "Helsingiss\u00e4", "Tampereella")
+    // Match with suffixes (e.g., "Espoossa", "Vantaalla")
     for (const suffix of suffixes) {
       if (text.includes(muni.name + suffix)) return muni;
       // Handle names ending in vowel where suffix replaces it
-      const nameBase = muni.name.replace(/[aeiou\u00e4\u00f6]$/i, '');
+      const nameBase = muni.name.replace(/[aeiouäö]$/i, '');
       if (nameBase.length >= 3 && text.includes(nameBase + suffix)) return muni;
     }
   }

@@ -431,6 +431,7 @@ export interface CrimeMapFeature {
     crimesPerCapita?: number;
     year: number;
     category: 'low' | 'medium' | 'high' | 'very_high';
+    crimeBreakdown?: string;
   };
 }
 
@@ -482,13 +483,20 @@ export async function fetchCrimeMapData(
     86400 // 24h TTL
   );
 
+  // Kaikki rikoskategoriat erittelyä varten
+  const ALL_CRIME_CATEGORIES = ['SSS', '010000', '020000', '030000', '050000', '060000', '070000', '090000'];
+
   // Käytä staattista dataa jos saatavilla
   let crimeStats: CrimeStatistics[];
+  // Breakdown: kuntakoodi -> { kategoria: lkm }
+  const crimeBreakdown = new Map<string, Record<string, number>>();
+
   if (useStaticData) {
     const { getStaticCrimeStats, getAvailableYears } = await import('./static-data');
     const availableYears = getAvailableYears();
 
     if (availableYears.includes(year)) {
+      // Hae valittujen kategorioiden data normaalisti
       const staticStats = getStaticCrimeStats(year, categories);
       crimeStats = staticStats.map(s => ({
         municipalityCode: s.municipalityCode,
@@ -496,6 +504,17 @@ export async function fetchCrimeMapData(
         year: parseInt(year),
         totalCrimes: s.totalCrimes,
       }));
+
+      // Hae KAIKKI kategoriat erikseen klikki-erittelyä varten
+      for (const cat of ALL_CRIME_CATEGORIES) {
+        const catStats = getStaticCrimeStats(year, [cat]);
+        for (const s of catStats) {
+          const existing = crimeBreakdown.get(s.municipalityCode) || {};
+          existing[cat] = s.totalCrimes;
+          crimeBreakdown.set(s.municipalityCode, existing);
+        }
+      }
+
       console.log(`Käytetään staattista dataa vuodelle ${year}`);
     } else {
       console.log(`Vuosi ${year} ei staattisessa datassa, haetaan API:sta`);
@@ -565,6 +584,9 @@ export async function fetchCrimeMapData(
       ? (stats?.crimesPerCapita ?? 0)
       : crimes;
 
+    // Rikosjakauma klikkimodaalia varten
+    const breakdown = crimeBreakdown.get(kuntaCode);
+
     features.push({
       type: 'Feature',
       geometry: boundary.geometry,
@@ -575,6 +597,7 @@ export async function fetchCrimeMapData(
         crimesPerCapita: stats?.crimesPerCapita,
         year: parseInt(year),
         category: categorizeByQuantile(valueForCategory, allValues),
+        crimeBreakdown: breakdown ? JSON.stringify(breakdown) : undefined,
       },
     });
   }
