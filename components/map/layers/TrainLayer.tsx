@@ -28,7 +28,7 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
     layerVisibleRef.current = train.layerVisible;
   }, [train.layerVisible]);
 
-  // Map setup — follows TrafficLayer's proven pattern
+  // Map setup
   useEffect(() => {
     if (!map) return;
 
@@ -36,117 +36,126 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
       try {
         await loadMapIcons(map);
       } catch (error) {
-        console.error('Failed to load train icons:', error);
+        console.error('[TrainLayer] icon load error:', error);
       }
 
-      if (!map.getSource(SOURCE_ID)) {
-        map.addSource(SOURCE_ID, {
-          type: 'geojson',
-          data: { type: 'FeatureCollection', features: [] },
-          cluster: true,
-          clusterMaxZoom: 10,
-          clusterRadius: 50,
-        });
+      try {
+        if (!map.getSource(SOURCE_ID)) {
+          map.addSource(SOURCE_ID, {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] },
+            cluster: true,
+            clusterMaxZoom: 10,
+            clusterRadius: 50,
+          });
+        }
+      } catch (error) {
+        console.error('[TrainLayer] source error:', error);
+        return;
       }
 
-      if (!map.getLayer(CLUSTER_LAYER)) {
-        map.addLayer({
-          id: CLUSTER_LAYER,
-          type: 'circle',
-          source: SOURCE_ID,
-          filter: ['has', 'point_count'],
-          paint: {
-            'circle-color': '#22c55e',
-            'circle-radius': [
-              'step', ['get', 'point_count'],
-              14, 10, 18, 50, 24,
-            ],
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#fff',
-            'circle-opacity': 0.85,
-          },
-          layout: {
-            'visibility': train.layerVisible ? 'visible' : 'none',
-          },
-        });
+      try {
+        if (!map.getLayer(CLUSTER_LAYER)) {
+          map.addLayer({
+            id: CLUSTER_LAYER,
+            type: 'circle',
+            source: SOURCE_ID,
+            filter: ['has', 'point_count'],
+            paint: {
+              'circle-color': '#22c55e',
+              'circle-radius': [
+                'step', ['get', 'point_count'],
+                14, 10, 18, 50, 24,
+              ],
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#fff',
+              'circle-opacity': 0.85,
+            },
+            layout: {
+              'visibility': train.layerVisible ? 'visible' : 'none',
+            },
+          });
 
-        map.addLayer({
-          id: CLUSTER_COUNT_LAYER,
-          type: 'symbol',
-          source: SOURCE_ID,
-          filter: ['has', 'point_count'],
-          layout: {
-            'text-field': '{point_count_abbreviated}',
-            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-            'text-size': 11,
-            'visibility': train.layerVisible ? 'visible' : 'none',
-          },
-          paint: {
-            'text-color': '#ffffff',
-          },
-        });
+          map.addLayer({
+            id: CLUSTER_COUNT_LAYER,
+            type: 'symbol',
+            source: SOURCE_ID,
+            filter: ['has', 'point_count'],
+            layout: {
+              'text-field': '{point_count_abbreviated}',
+              'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+              'text-size': 11,
+              'visibility': train.layerVisible ? 'visible' : 'none',
+            },
+            paint: {
+              'text-color': '#ffffff',
+            },
+          });
 
-        map.addLayer({
-          id: ICONS_LAYER,
-          type: 'symbol',
-          source: SOURCE_ID,
-          filter: ['!', ['has', 'point_count']],
-          layout: {
-            'icon-image': 'event-train',
-            'icon-size': [
-              'interpolate', ['linear'], ['zoom'],
-              4, 0.2,
-              8, 0.35,
-              12, 0.55,
-              16, 0.75,
-            ],
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-            'visibility': train.layerVisible ? 'visible' : 'none',
-          },
-        });
+          map.addLayer({
+            id: ICONS_LAYER,
+            type: 'symbol',
+            source: SOURCE_ID,
+            filter: ['!', ['has', 'point_count']],
+            layout: {
+              'icon-image': 'event-train',
+              'icon-size': [
+                'interpolate', ['linear'], ['zoom'],
+                4, 0.2,
+                8, 0.35,
+                12, 0.55,
+                16, 0.75,
+              ],
+              'icon-allow-overlap': true,
+              'icon-ignore-placement': true,
+              'visibility': train.layerVisible ? 'visible' : 'none',
+            },
+          });
 
-        // Click handler for clusters -> zoom in
-        map.on('click', CLUSTER_LAYER, (e: any) => {
-          const features = e.features;
-          if (!features?.length) return;
-          const clusterId = features[0].properties.cluster_id;
-          const source = map.getSource(SOURCE_ID) as any;
-          source.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
-            if (err) return;
-            map.easeTo({
-              center: features[0].geometry.coordinates,
-              zoom: zoom + 0.5,
-              duration: 500,
+          // Click handler for clusters -> zoom in
+          map.on('click', CLUSTER_LAYER, (e: any) => {
+            const features = e.features;
+            if (!features?.length) return;
+            const clusterId = features[0].properties.cluster_id;
+            const source = map.getSource(SOURCE_ID) as any;
+            source.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
+              if (err) return;
+              map.easeTo({
+                center: features[0].geometry.coordinates,
+                zoom: zoom + 0.5,
+                duration: 500,
+              });
             });
           });
-        });
 
-        // Click handler for icons -> event details
-        map.on('click', ICONS_LAYER, (e: any) => {
-          const features = e.features;
-          if (!features?.length) return;
-          const props = features[0].properties;
+          // Click handler for icons -> event details
+          map.on('click', ICONS_LAYER, (e: any) => {
+            const features = e.features;
+            if (!features?.length) return;
+            const props = features[0].properties;
 
-          let metadata = props.metadata;
-          if (typeof metadata === 'string') {
-            try { metadata = JSON.parse(metadata); } catch { metadata = undefined; }
-          }
+            let metadata = props.metadata;
+            if (typeof metadata === 'string') {
+              try { metadata = JSON.parse(metadata); } catch { metadata = undefined; }
+            }
 
-          onEventSelect?.({
-            id: props.id,
-            type: props.type,
-            category: props.category,
-            title: props.title,
-            description: props.description || '',
-            locationName: props.locationName || '',
-            timestamp: props.timestamp,
-            severity: props.severity,
-            source: props.source || 'Fintraffic',
-            metadata,
-            screenPosition: { x: e.point.x, y: e.point.y },
+            onEventSelect?.({
+              id: props.id,
+              type: props.type,
+              category: props.category,
+              title: props.title,
+              description: props.description || '',
+              locationName: props.locationName || '',
+              timestamp: props.timestamp,
+              severity: props.severity,
+              source: props.source || 'Fintraffic',
+              metadata,
+              screenPosition: { x: e.point.x, y: e.point.y },
+            });
           });
-        });
+        }
+      } catch (error) {
+        console.error('[TrainLayer] layer error:', error);
       }
     };
 
@@ -165,20 +174,25 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
     fetchDataRef.current = fetchData;
 
     const initMap = async () => {
-      await addSourceAndLayers();
-      console.log('[TrainLayer] Layers ready');
-      setLayersReady(true);
-      // Initial fetch if layer is already visible
-      if (layerVisibleRef.current) {
-        await fetchData();
+      try {
+        await addSourceAndLayers();
+        if (map.getSource(SOURCE_ID)) {
+          console.log('[TrainLayer] Layers ready');
+          setLayersReady(true);
+          if (layerVisibleRef.current) {
+            await fetchData();
+          }
+        }
+      } catch (error) {
+        console.error('[TrainLayer] initMap FAILED:', error);
       }
     };
 
-    if (map.isStyleLoaded()) {
-      initMap();
-    } else {
-      map.on('load', initMap);
-    }
+    // Always call initMap directly — isStyleLoaded() returns false when
+    // other layers load icons concurrently, but the 'load' event already
+    // fired so map.on('load') would never trigger. addSourceAndLayers is
+    // fully try-caught. style.load handler re-inits if needed.
+    initMap();
 
     const handleStyleLoad = async () => {
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -232,7 +246,6 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
       if (!train.layerVisible || !allData) {
         source.setData({ type: 'FeatureCollection', features: [] });
       } else {
-        // Filter by selected train types
         const filtered: EventFeatureCollection = {
           type: 'FeatureCollection',
           features: allData.features.filter(f => {
