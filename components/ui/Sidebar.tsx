@@ -21,6 +21,7 @@ import UnemploymentSettings from './settings/UnemploymentSettings';
 import HousingSettings from './settings/HousingSettings';
 import PopulationSettings from './settings/PopulationSettings';
 import HealthSettings from './settings/HealthSettings';
+import IceSettings from './settings/IceSettings';
 
 const GROUP_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'energy', 'statistics', 'health', 'media'];
 
@@ -40,6 +41,7 @@ export default function Sidebar() {
     news,
     train,
     snow,
+    ice,
     election,
     associations,
     energy,
@@ -57,6 +59,7 @@ export default function Sidebar() {
     setNewsLayerVisible,
     setTrainLayerVisible,
     setSnowLayerVisible,
+    setIceLayerVisible,
     setElectionLayerVisible,
     setAssociationsLayerVisible,
     setEnergyLayerVisible,
@@ -81,6 +84,7 @@ export default function Sidebar() {
     news: { visible: news.layerVisible, toggle: setNewsLayerVisible },
     train: { visible: train.layerVisible, toggle: setTrainLayerVisible },
     snow: { visible: snow.layerVisible, toggle: setSnowLayerVisible },
+    ice: { visible: ice.layerVisible, toggle: setIceLayerVisible },
     election: { visible: election.layerVisible, toggle: setElectionLayerVisible },
     associations: { visible: associations.layerVisible, toggle: setAssociationsLayerVisible },
     energy: { visible: energy.layerVisible, toggle: setEnergyLayerVisible },
@@ -92,11 +96,11 @@ export default function Sidebar() {
   }), [
     weather.layerVisible, roadWeather.layerVisible, weatherCamera.layerVisible,
     traffic.layerVisible, transit.layerVisible, crime.layerVisible, news.layerVisible,
-    train.layerVisible, snow.layerVisible, election.layerVisible, associations.layerVisible,
+    train.layerVisible, snow.layerVisible, ice.layerVisible, election.layerVisible, associations.layerVisible,
     energy.layerVisible, unemployment.layerVisible, housing.layerVisible, population.layerVisible, health.layerVisible, hotLips.layerVisible,
     setWeatherLayerVisible, setRoadWeatherLayerVisible, setWeatherCameraLayerVisible,
     setTrafficLayerVisible, setTransitLayerVisible, setCrimeLayerVisible, setNewsLayerVisible,
-    setTrainLayerVisible, setSnowLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
+    setTrainLayerVisible, setSnowLayerVisible, setIceLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
     setEnergyLayerVisible, setUnemploymentLayerVisible, setHousingLayerVisible, setPopulationLayerVisible, setHealthLayerVisible, setHotLipsLayerVisible,
   ]);
 
@@ -115,6 +119,7 @@ export default function Sidebar() {
     housing: <HousingSettings />,
     population: <PopulationSettings />,
     health: <HealthSettings />,
+    ice: <IceSettings />,
   };
 
   // Filter layers by search query
