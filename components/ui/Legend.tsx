@@ -28,13 +28,22 @@ const ASSOCIATIONS_QUANTILES = [
   { label: 'Erittäin paljon (75-100%)', color: '#1e3a5f' },
 ];
 
+const ICE_THICKNESS_LEVELS = [
+  { label: '0\u201310 cm (ohut)', color: '#ef4444' },
+  { label: '10\u201320 cm', color: '#f97316' },
+  { label: '20\u201335 cm', color: '#eab308' },
+  { label: '35\u201350 cm', color: '#22c55e' },
+  { label: '50\u201380 cm', color: '#38bdf8' },
+  { label: '80+ cm (paksu)', color: '#1e3a8a' },
+];
+
 interface LegendConfig {
   title: string;
   items: Array<{ label: string; color: string }>;
 }
 
 export default function Legend() {
-  const { crime, election, associations, theme } = useUnifiedFilters();
+  const { crime, election, associations, ice, theme } = useUnifiedFilters();
 
   const legendConfig = useMemo((): LegendConfig | null => {
     const showCrime = crime.layerVisible && crime.categories.length > 0;
@@ -61,8 +70,15 @@ export default function Legend() {
       };
     }
 
+    if (ice.layerVisible && ice.showLakes) {
+      return {
+        title: '🧊 Jään paksuus (SYKE)',
+        items: ICE_THICKNESS_LEVELS,
+      };
+    }
+
     return null;
-  }, [crime, election, associations]);
+  }, [crime, election, associations, ice]);
 
   if (!legendConfig) return null;
 

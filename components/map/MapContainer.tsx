@@ -60,6 +60,15 @@ export default function MapContainer({ onMapReady, children, theme = 'dark' }: M
     );
 
     mapInstance.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserHeading: true,
+      }),
+      'top-right'
+    );
+
+    mapInstance.addControl(
       new mapboxgl.AttributionControl({ compact: true }),
       'bottom-right'
     );

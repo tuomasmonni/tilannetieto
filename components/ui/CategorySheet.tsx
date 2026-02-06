@@ -17,6 +17,7 @@ import UnemploymentSettings from './settings/UnemploymentSettings';
 import HousingSettings from './settings/HousingSettings';
 import PopulationSettings from './settings/PopulationSettings';
 import HealthSettings from './settings/HealthSettings';
+import IceSettings from './settings/IceSettings';
 
 interface CategorySheetProps {
   group: LayerGroupKey | null;
@@ -35,6 +36,7 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     news,
     train,
     snow,
+    ice,
     election,
     associations,
     energy,
@@ -59,6 +61,7 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     setHousingLayerVisible,
     setPopulationLayerVisible,
     setHealthLayerVisible,
+    setIceLayerVisible,
     setHotLipsLayerVisible,
   } = useUnifiedFilters();
 
@@ -86,15 +89,16 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     population: { visible: population.layerVisible, toggle: setPopulationLayerVisible },
     health: { visible: health.layerVisible, toggle: setHealthLayerVisible },
     hotLips: { visible: hotLips.layerVisible, toggle: setHotLipsLayerVisible },
+    ice: { visible: ice.layerVisible, toggle: setIceLayerVisible },
   }), [
     weather.layerVisible, roadWeather.layerVisible, weatherCamera.layerVisible,
     traffic.layerVisible, transit.layerVisible, crime.layerVisible, news.layerVisible,
     train.layerVisible, snow.layerVisible, election.layerVisible, associations.layerVisible,
-    energy.layerVisible, unemployment.layerVisible, housing.layerVisible, population.layerVisible, health.layerVisible, hotLips.layerVisible,
+    energy.layerVisible, unemployment.layerVisible, housing.layerVisible, population.layerVisible, health.layerVisible, hotLips.layerVisible, ice.layerVisible,
     setWeatherLayerVisible, setRoadWeatherLayerVisible, setWeatherCameraLayerVisible,
     setTrafficLayerVisible, setTransitLayerVisible, setCrimeLayerVisible, setNewsLayerVisible,
     setTrainLayerVisible, setSnowLayerVisible, setElectionLayerVisible, setAssociationsLayerVisible,
-    setEnergyLayerVisible, setUnemploymentLayerVisible, setHousingLayerVisible, setPopulationLayerVisible, setHealthLayerVisible, setHotLipsLayerVisible,
+    setEnergyLayerVisible, setUnemploymentLayerVisible, setHousingLayerVisible, setPopulationLayerVisible, setHealthLayerVisible, setHotLipsLayerVisible, setIceLayerVisible,
   ]);
 
   const layerSettings: Record<string, React.ReactNode> = {
@@ -111,6 +115,7 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     housing: <HousingSettings />,
     population: <PopulationSettings />,
     health: <HealthSettings />,
+    ice: <IceSettings />,
   };
 
   const closeSheet = useCallback(() => {

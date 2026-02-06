@@ -70,6 +70,11 @@ const SnowLayer = dynamic(
   { ssr: false }
 );
 
+const IceLayer = dynamic(
+  () => import('@/components/map/layers/IceLayer'),
+  { ssr: false }
+);
+
 const UnemploymentLayer = dynamic(
   () => import('@/components/map/layers/UnemploymentLayer'),
   { ssr: false }
@@ -167,6 +172,7 @@ function AppContent() {
             <NewsLayer map={map} onEventSelect={handleEventSelect} />
             <TrainLayer map={map} onEventSelect={handleEventSelect} />
             <SnowLayer map={map} onEventSelect={handleEventSelect} />
+            <IceLayer map={map} onEventSelect={handleEventSelect} />
             <ElectionLayer map={map} />
             <AssociationsLayer map={map} />
             <UnemploymentLayer map={map} />

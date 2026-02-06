@@ -93,6 +93,14 @@ interface UnifiedFilterState {
     layerVisible: boolean;
   };
 
+  // Jäänpaksuus (SYKE + FMI WMS + Digitraffic)
+  ice: {
+    layerVisible: boolean;
+    showLakes: boolean;
+    showSeaIce: boolean;
+    showIcebreakers: boolean;
+  };
+
   // Eduskuntavaalit
   election: {
     year: string;
@@ -141,6 +149,7 @@ interface UnifiedFilterState {
     isLoading: boolean;
   };
 
+  // Hot Lips
   hotLips: {
     layerVisible: boolean;
   };
@@ -199,6 +208,12 @@ interface UnifiedFilterActions {
   // Snow actions
   setSnowLayerVisible: (visible: boolean) => void;
 
+  // Ice actions
+  setIceLayerVisible: (visible: boolean) => void;
+  setIceShowLakes: (show: boolean) => void;
+  setIceShowSeaIce: (show: boolean) => void;
+  setIceShowIcebreakers: (show: boolean) => void;
+
   // Election actions
   setElectionYear: (year: string) => void;
   setElectionLayerVisible: (visible: boolean) => void;
@@ -233,6 +248,7 @@ interface UnifiedFilterActions {
   setHealthLayerVisible: (visible: boolean) => void;
   setHealthLoading: (loading: boolean) => void;
 
+  // Hot Lips actions
   setHotLipsLayerVisible: (visible: boolean) => void;
 
   // General actions
@@ -289,6 +305,12 @@ const DEFAULT_STATE: UnifiedFilterState = {
   },
   snow: {
     layerVisible: false,
+  },
+  ice: {
+    layerVisible: false,
+    showLakes: true,
+    showSeaIce: true,
+    showIcebreakers: false,
   },
   election: {
     year: '2023',
@@ -606,6 +628,36 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     }));
   }, []);
 
+  // ========== ICE ACTIONS ==========
+
+  const setIceLayerVisible = useCallback((visible: boolean) => {
+    setState(prev => ({
+      ...prev,
+      ice: { ...prev.ice, layerVisible: visible },
+    }));
+  }, []);
+
+  const setIceShowLakes = useCallback((show: boolean) => {
+    setState(prev => ({
+      ...prev,
+      ice: { ...prev.ice, showLakes: show },
+    }));
+  }, []);
+
+  const setIceShowSeaIce = useCallback((show: boolean) => {
+    setState(prev => ({
+      ...prev,
+      ice: { ...prev.ice, showSeaIce: show },
+    }));
+  }, []);
+
+  const setIceShowIcebreakers = useCallback((show: boolean) => {
+    setState(prev => ({
+      ...prev,
+      ice: { ...prev.ice, showIcebreakers: show },
+    }));
+  }, []);
+
   // ========== ELECTION ACTIONS ==========
 
   const setElectionYear = useCallback((year: string) => {
@@ -760,6 +812,8 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     }));
   }, []);
 
+  // ========== HOT LIPS ACTIONS ==========
+
   const setHotLipsLayerVisible = useCallback((visible: boolean) => {
     setState(prev => ({ ...prev, hotLips: { ...prev.hotLips, layerVisible: visible } }));
   }, []);
@@ -802,6 +856,10 @@ export function UnifiedFilterProvider({ children }: UnifiedFilterProviderProps) 
     setTrainLayerVisible,
     toggleTrainType,
     setSnowLayerVisible,
+    setIceLayerVisible,
+    setIceShowLakes,
+    setIceShowSeaIce,
+    setIceShowIcebreakers,
     setElectionYear,
     setElectionLayerVisible,
     setAssociationsLayerVisible,

@@ -34,6 +34,12 @@ body {
   filter: invert(1);
 }
 
+/* GeolocateControl aktiivitila - säilytä sininen väri */
+.mapboxgl-ctrl-geolocate-active .mapboxgl-ctrl-icon,
+.mapboxgl-ctrl-geolocate-background .mapboxgl-ctrl-icon {
+  filter: none;
+}
+
 .mapboxgl-ctrl-attrib {
   background: rgba(24, 24, 27, 0.8) !important;
   color: #71717a !important;

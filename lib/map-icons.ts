@@ -164,6 +164,20 @@ export const snowflakeIcon = `
 </svg>
 `;
 
+// Jää - sininen ympyrä jääkiteellä
+export const iceIcon = `
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow-ice" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <circle cx="20" cy="20" r="16" fill="#38bdf8" stroke="#ffffff" stroke-width="2" filter="url(#shadow-ice)"/>
+  <path d="M20 8v24M14 11l6 4 6-4M14 29l6-4 6 4M8 20h24M11 14l4 6-4 6M29 14l-4 6 4 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="20" cy="20" r="2.5" fill="white"/>
+</svg>
+`;
+
 // Hot Lips
 export const hotlipsIcon = `
 <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
@@ -199,6 +213,7 @@ export const mapIcons: Record<string, string> = {
   bus: busIcon,
   thermometer: thermometerIcon,
   snowflake: snowflakeIcon,
+  ice: iceIcon,
   hotlips: hotlipsIcon,
   default: defaultIcon,
 };

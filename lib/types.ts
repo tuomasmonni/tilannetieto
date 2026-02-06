@@ -11,7 +11,7 @@ import type { EventCategory } from './constants';
 
 export interface NormalizedEvent {
   id: string;
-  type: 'traffic' | 'roadwork' | 'train' | 'camera' | 'news' | 'weather' | 'transit' | 'road_weather' | 'snow';
+  type: 'traffic' | 'roadwork' | 'train' | 'camera' | 'news' | 'weather' | 'transit' | 'road_weather' | 'snow' | 'ice';
   category: EventCategory;
   title: string;
   description: string;
