@@ -129,7 +129,7 @@ export const POLLING_INTERVALS = {
   cameras: 300_000,   // 5 min
   feeds: 300_000,     // 5 min
   weather: 300_000,   // 5 min (FMI)
-  transit: 15_000,    // 15 sec (HSL GTFS-RT)
+  transit: 10_000,    // 10 sec (HSL GTFS-RT)
   roadWeather: 300_000, // 5 min (Digitraffic)
   news: 900_000,      // 15 min (RSS feeds)
   snow: 300_000,      // 5 min (FMI lumensyvyys)
@@ -181,8 +181,8 @@ export type NewsSourceKey = keyof typeof NEWS_SOURCES;
 // LAYER GROUPS (Category Navigator)
 // ============================================
 
-export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations' | 'energy' | 'unemployment' | 'housing' | 'population' | 'health';
-export type LayerGroupKey = 'weather' | 'traffic' | 'statistics' | 'media' | 'energy' | 'health';
+export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations' | 'energy' | 'unemployment' | 'housing' | 'population' | 'health' | 'hotLips';
+export type LayerGroupKey = 'weather' | 'traffic' | 'statistics' | 'media' | 'energy' | 'health' | 'services';
 
 export interface LayerGroupConfig {
   label: string;
