@@ -96,6 +96,12 @@ export const EVENT_CATEGORIES = {
     label: 'Lumitilanne',
     emoji: '\u2744\uFE0F',
   },
+  ice: {
+    color: '#38bdf8',
+    icon: 'ice',
+    label: 'Jäänpaksuus',
+    emoji: '\u{1F9CA}',
+  },
 } as const;
 
 export type EventCategory = keyof typeof EVENT_CATEGORIES;
@@ -133,6 +139,7 @@ export const POLLING_INTERVALS = {
   roadWeather: 300_000, // 5 min (Digitraffic)
   news: 900_000,      // 15 min (RSS feeds)
   snow: 300_000,      // 5 min (FMI lumensyvyys)
+  ice: 1_800_000,     // 30 min (SYKE jäänpaksuus)
 } as const;
 
 export const API_ENDPOINTS = {
@@ -181,7 +188,7 @@ export type NewsSourceKey = keyof typeof NEWS_SOURCES;
 // LAYER GROUPS (Category Navigator)
 // ============================================
 
-export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations' | 'energy' | 'unemployment' | 'housing' | 'population' | 'health' | 'hotLips';
+export type LayerKey = 'weather' | 'roadWeather' | 'weatherCamera' | 'snow' | 'ice' | 'traffic' | 'transit' | 'train' | 'crime' | 'news' | 'election' | 'associations' | 'energy' | 'unemployment' | 'housing' | 'population' | 'health' | 'hotLips';
 export type LayerGroupKey = 'weather' | 'traffic' | 'statistics' | 'media' | 'energy' | 'health' | 'services';
 
 export interface LayerGroupConfig {
@@ -198,7 +205,7 @@ export const LAYER_GROUPS: Record<LayerGroupKey, LayerGroupConfig> = {
     icon: '☀️',
     color: '#06b6d4',
     tailwindColor: 'group-weather',
-    layers: ['weather', 'roadWeather', 'weatherCamera', 'snow'],
+    layers: ['weather', 'roadWeather', 'weatherCamera', 'snow', 'ice'],
   },
   traffic: {
     label: 'Liikenne',
@@ -254,6 +261,7 @@ export const LAYER_INFO: Record<LayerKey, { label: string; icon: string; descrip
   news: { label: 'Uutiset', icon: '📰', description: 'YLE, IL, MTV' },
   train: { label: 'Junat', icon: '🚆', description: 'Reaaliaikaiset junasijainnit' },
   snow: { label: 'Lumitilanne', icon: '❄️', description: 'FMI lumensyvyys' },
+  ice: { label: 'Jäänpaksuus', icon: '🧊', description: 'SYKE järvet + FMI merijää' },
   election: { label: 'Eduskuntavaalit', icon: '🏛️', description: 'Vaalitulokset kunnittain' },
   associations: { label: 'Yhdistykset', icon: '🤝', description: 'Rekisteröidyt yhdistykset' },
   energy: { label: 'Sähköjärjestelmä', icon: '⚡', description: 'Fingrid reaaliaikainen' },
