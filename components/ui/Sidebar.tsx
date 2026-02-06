@@ -21,7 +21,6 @@ import UnemploymentSettings from './settings/UnemploymentSettings';
 import HousingSettings from './settings/HousingSettings';
 import PopulationSettings from './settings/PopulationSettings';
 import HealthSettings from './settings/HealthSettings';
-import IceSettings from './settings/IceSettings';
 
 const GROUP_ORDER: LayerGroupKey[] = ['weather', 'traffic', 'energy', 'statistics', 'health', 'media'];
 
@@ -119,7 +118,6 @@ export default function Sidebar() {
     housing: <HousingSettings />,
     population: <PopulationSettings />,
     health: <HealthSettings />,
-    ice: <IceSettings />,
   };
 
   // Filter layers by search query

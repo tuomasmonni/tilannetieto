@@ -17,7 +17,6 @@ import UnemploymentSettings from './settings/UnemploymentSettings';
 import HousingSettings from './settings/HousingSettings';
 import PopulationSettings from './settings/PopulationSettings';
 import HealthSettings from './settings/HealthSettings';
-import IceSettings from './settings/IceSettings';
 
 interface CategorySheetProps {
   group: LayerGroupKey | null;
@@ -37,7 +36,6 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     train,
     snow,
     ice,
-    setIceLayerVisible,
     election,
     associations,
     energy,
@@ -62,7 +60,6 @@ export default function CategorySheet({ group, onClose }: CategorySheetProps) {
     setHousingLayerVisible,
     setPopulationLayerVisible,
     setHealthLayerVisible,
-    setIceLayerVisible,
     setHotLipsLayerVisible,
   } = useUnifiedFilters();
 
