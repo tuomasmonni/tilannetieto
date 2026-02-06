@@ -186,25 +186,23 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
     fetchDataRef.current = fetchData;
 
     const initMap = async () => {
-      console.log('[TrainLayer] initMap: start');
       try {
         await addSourceAndLayers();
-        console.log('[TrainLayer] Layers ready');
-        setLayersReady(true);
-        if (layerVisibleRef.current) {
-          await fetchData();
+        if (map.getSource(SOURCE_ID)) {
+          console.log('[TrainLayer] Layers ready');
+          setLayersReady(true);
+          if (layerVisibleRef.current) {
+            await fetchData();
+          }
         }
       } catch (error) {
         console.error('[TrainLayer] initMap FAILED:', error);
       }
     };
 
-    console.log('[TrainLayer] effect: map.isStyleLoaded =', map.isStyleLoaded());
-    if (map.isStyleLoaded()) {
-      initMap();
-    } else {
-      map.on('load', initMap);
-    }
+    // Always call initMap — isStyleLoaded() returns false when other
+    // layers load icons concurrently, and 'load' already fired
+    initMap();
 
     const handleStyleLoad = async () => {
       await new Promise(resolve => setTimeout(resolve, 100));
