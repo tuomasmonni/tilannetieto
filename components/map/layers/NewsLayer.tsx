@@ -91,7 +91,7 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
           type: 'geojson',
           data: { type: 'FeatureCollection', features: [] },
           cluster: true,
-          clusterMaxZoom: 12,
+          clusterMaxZoom: 14,
           clusterRadius: 40,
         });
 
@@ -146,22 +146,15 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
           },
           paint: {
             'circle-radius': [
-              'case',
-              ['>', ['coalesce', ['get', 'sourceCount'], 1], 1],
-              ['interpolate', ['linear'], ['zoom'], 4, 8, 8, 11, 12, 14],
-              ['interpolate', ['linear'], ['zoom'], 4, 5, 8, 7, 12, 9],
+              'interpolate', ['linear'], ['zoom'],
+              4, 6, 8, 8, 12, 10, 16, 14,
             ],
             'circle-color': [
               'match', ['get', 'category'],
               ...Object.entries(CATEGORY_COLORS).flatMap(([k, v]) => [k, v]),
               '#6b7280', // default
             ],
-            'circle-stroke-width': [
-              'case',
-              ['>', ['coalesce', ['get', 'sourceCount'], 1], 1],
-              3,
-              2,
-            ],
+            'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff',
             'circle-opacity': 0.9,
           },
@@ -182,7 +175,7 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
           paint: {
             'circle-radius': [
               'interpolate', ['linear'], ['zoom'],
-              5, 18, 10, 24, 15, 32,
+              5, 18, 10, 24, 14, 32, 18, 40,
             ],
             'circle-color': 'transparent',
             'circle-stroke-color': '#ef4444',
