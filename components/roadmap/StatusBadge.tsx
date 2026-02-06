@@ -1,0 +1,3 @@
+'use client';
+const S: Record<string, { l: string; b: string; t: string }> = { proposed: { l: 'Ehdotettu', b: 'bg-zinc-700', t: 'text-zinc-300' }, planned: { l: 'Suunnitteilla', b: 'bg-blue-900/50', t: 'text-blue-300' }, in_progress: { l: 'Työn alla', b: 'bg-amber-900/50', t: 'text-amber-300' }, completed: { l: 'Valmis', b: 'bg-green-900/50', t: 'text-green-300' }, rejected: { l: 'Hylätty', b: 'bg-red-900/50', t: 'text-red-300' } };
+export default function StatusBadge({ status }: { status: string }) { const c = S[status] || S.proposed; return <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${c.b} ${c.t}`}>{c.l}</span>; }

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
+import Providers from './providers';
 import './globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="fi">
       <body className="bg-zinc-950 text-zinc-50">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Analytics />
       </body>
     </html>
