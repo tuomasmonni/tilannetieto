@@ -95,6 +95,11 @@ const HealthLayer = dynamic(
   { ssr: false }
 );
 
+const EnergyTransferLayer = dynamic(
+  () => import('@/components/map/layers/EnergyTransferLayer'),
+  { ssr: false }
+);
+
 const WeatherCameraModal = dynamic(
   () => import('@/components/ui/WeatherCameraModal'),
   { ssr: false }
@@ -170,6 +175,7 @@ function AppContent() {
             <HousingLayer map={map} />
             <PopulationLayer map={map} />
             <HealthLayer map={map} />
+            <EnergyTransferLayer map={map} />
           </>
         )}
       </MapContainer>

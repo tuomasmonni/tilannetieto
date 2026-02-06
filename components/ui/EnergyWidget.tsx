@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
-import { FINGRID_DATASETS, type EnergyOverview } from '@/lib/data/fingrid/client';
+import { FINGRID_DATASETS, type EnergyOverview, type CrossBorderTransfer } from '@/lib/data/fingrid/client';
 
 const REFRESH_INTERVAL = 300_000; // 5 min
 
@@ -151,6 +151,34 @@ export default function EnergyWidget() {
             </div>
             {renderProductionMix()}
           </div>
+
+          {/* Rajasiirrot */}
+          {data.transfers && data.transfers.length > 0 && (
+            <div>
+              <div className={`text-[10px] font-medium mb-1 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                Rajasiirrot
+              </div>
+              <div className="space-y-0.5">
+                {data.transfers.map((t: CrossBorderTransfer) => {
+                  const isExport = t.value >= 0;
+                  const label = t.connection.replace('FI-', '');
+                  return (
+                    <div key={t.connection} className={`flex items-center justify-between text-xs px-2 py-1 rounded ${
+                      isDark ? 'bg-zinc-800' : 'bg-zinc-50'
+                    }`}>
+                      <span className={isDark ? 'text-zinc-300' : 'text-zinc-700'}>{label}</span>
+                      <span className={isExport
+                        ? isDark ? 'text-green-400' : 'text-green-600'
+                        : isDark ? 'text-red-400' : 'text-red-600'
+                      }>
+                        {isExport ? '→' : '←'} {Math.abs(Math.round(t.value)).toLocaleString('fi-FI')} MW
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Timestamp */}
           <div className={`text-[10px] ${isDark ? 'text-zinc-600' : 'text-zinc-400'}`}>
