@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchPopulationMapData } from '@/lib/data/population/api';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const year = request.nextUrl.searchParams.get('year') || '2024';

@@ -56,13 +56,6 @@ export async function fetchUnemploymentByMunicipality(
   const query: PxWebQuery = {
     query: [
       {
-        code: 'Kuukausi',
-        selection: {
-          filter: 'item',
-          values: [`${year}M12`] // Joulukuu = vuoden loppu
-        }
-      },
-      {
         code: 'Alue',
         selection: {
           filter: 'all',
@@ -70,10 +63,24 @@ export async function fetchUnemploymentByMunicipality(
         }
       },
       {
+        code: 'Ammattiryhmä',
+        selection: {
+          filter: 'item',
+          values: ['SSS'] // Yhteensä (kaikki ammattiryhmät)
+        }
+      },
+      {
+        code: 'Kuukausi',
+        selection: {
+          filter: 'item',
+          values: [`${year}M12`] // Joulukuu = vuoden loppu
+        }
+      },
+      {
         code: 'Tiedot',
         selection: {
           filter: 'item',
-          values: ['TYOTTOMIEN_MAARA'] // Työttömien lukumäärä
+          values: ['TYOTTOMATLOPUSSA'] // Työttömät työnhakijat laskentapäivänä
         }
       }
     ],
@@ -99,7 +106,7 @@ function parseUnemploymentData(data: any, year: number): UnemploymentStats[] {
 
   if (data.data && Array.isArray(data.data)) {
     for (const item of data.data) {
-      const rawCode = item.key?.[1] || '';
+      const rawCode = item.key?.[0] || '';
       const value = parseInt(item.values?.[0]) || 0;
 
       if (rawCode === 'SSS' || rawCode === '200' || rawCode === 'X') continue;

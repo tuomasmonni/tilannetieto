@@ -48,7 +48,7 @@ export interface HousingMapGeoJSON {
 export async function fetchHousingPricesByMunicipality(
   year: string = '2024'
 ): Promise<HousingStats[]> {
-  const url = `${PXWEB_BASE_URL}/ashi/statfin_ashi_pxt_112q.px`;
+  const url = `${PXWEB_BASE_URL}/ashi/statfin_ashi_pxt_13mx.px`;
 
   const query: PxWebQuery = {
     query: [
@@ -60,24 +60,24 @@ export async function fetchHousingPricesByMunicipality(
         }
       },
       {
-        code: 'Alue',
+        code: 'Kunta',
         selection: {
           filter: 'all',
           values: ['*']
         }
       },
       {
-        code: 'Huoneistotyypit',
+        code: 'Talotyyppi',
         selection: {
           filter: 'item',
-          values: ['0'] // Yhteensä (kaikki tyypit)
+          values: ['0'] // Talotyypit yhteensä
         }
       },
       {
         code: 'Tiedot',
         selection: {
           filter: 'item',
-          values: ['keskihinta_m2'] // €/m² keskiarvo
+          values: ['keskihinta_aritm_nw'] // Neliöhinta (EUR/m2)
         }
       }
     ],
@@ -103,18 +103,20 @@ function parseHousingData(data: any, year: number): HousingStats[] {
 
   if (data.data && Array.isArray(data.data)) {
     for (const item of data.data) {
-      const rawCode = item.key?.[1] || '';
-      const value = parseFloat(item.values?.[0]);
+      // Key: [Vuosi, Kunta (3-num), Talotyyppi]
+      const municipalityCode = item.key?.[1] || '';
+      const rawValue = item.values?.[0];
 
+      // ".." = ei dataa
+      if (!rawValue || rawValue === '..' || rawValue === '...') continue;
+      const value = parseFloat(rawValue);
       if (!value || isNaN(value) || value === 0) continue;
-      if (rawCode === 'SSS' || rawCode === '200' || rawCode === 'X') continue;
 
-      const municipalityCode = rawCode.startsWith('KU') ? rawCode.slice(2) : rawCode;
       if (!municipalityCode || municipalityCode.length !== 3) continue;
 
       results.push({
         municipalityCode,
-        municipalityName: rawCode,
+        municipalityName: municipalityCode,
         year,
         pricePerSqm: value,
       });
