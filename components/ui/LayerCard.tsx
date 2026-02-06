@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { useState, useCallback, ReactNode } from 'react';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import { LAYER_INFO, type LayerKey } from '@/lib/constants';
 
@@ -20,22 +20,28 @@ export default function LayerCard({ layerKey, isVisible, onToggle, statusText, c
 
   const hasSettings = !!children;
 
+  const handleToggle = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onToggle(!isVisible);
+  }, [isVisible, onToggle]);
+
   return (
     <div
-      className={`rounded-xl transition-all ${
+      className={`rounded-xl transition-colors ${
         isDark
           ? 'bg-white/5 hover:bg-white/[0.08]'
           : 'bg-black/5 hover:bg-black/[0.08]'
       }`}
     >
-      {/* Header row - expand and toggle are separate buttons */}
-      <div className="flex items-center gap-3 px-3 py-2.5">
-        {/* Left side: expand trigger (only if has settings) */}
+      {/* Header row */}
+      <div className="flex items-center gap-2 pl-3 pr-1 py-1">
+        {/* Left side: label + optional expand */}
         {hasSettings ? (
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-3 flex-1 min-w-0 text-left"
+            className="flex items-center gap-3 flex-1 min-w-0 text-left py-1.5"
             aria-expanded={expanded}
             aria-label={`${info.label} asetukset`}
           >
@@ -58,7 +64,7 @@ export default function LayerCard({ layerKey, isVisible, onToggle, statusText, c
             </svg>
           </button>
         ) : (
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-1 min-w-0 py-1.5">
             <span className="text-base flex-shrink-0">{info.icon}</span>
             <div className="flex-1 min-w-0">
               <span className={`text-sm font-medium ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>
@@ -73,27 +79,32 @@ export default function LayerCard({ layerKey, isVisible, onToggle, statusText, c
           </div>
         )}
 
-        {/* Toggle switch - separate from expand */}
-        <button
-          type="button"
-          onClick={() => onToggle(!isVisible)}
-          className={`toggle-switch relative w-10 h-6 rounded-full flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
-            isVisible
-              ? 'bg-green-500 hover:bg-green-600'
-              : isDark
-              ? 'bg-zinc-700 hover:bg-zinc-600'
-              : 'bg-zinc-300 hover:bg-zinc-400'
-          }`}
-          aria-label={`${info.label} ${isVisible ? 'pois' : 'päälle'}`}
-          aria-checked={isVisible}
+        {/* Toggle — 48x48 touch target, visual switch inside */}
+        <div
           role="switch"
+          tabIndex={0}
+          aria-checked={isVisible}
+          aria-label={`${info.label} ${isVisible ? 'pois' : 'päälle'}`}
+          onClick={handleToggle}
+          onTouchEnd={handleToggle}
+          className="flex-shrink-0 w-12 h-12 flex items-center justify-center cursor-pointer select-none touch-manipulation"
         >
-          <span
-            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-              isVisible ? 'translate-x-[18px]' : 'translate-x-0.5'
+          <div
+            className={`relative w-11 h-[26px] rounded-full transition-colors ${
+              isVisible
+                ? 'bg-green-500'
+                : isDark
+                ? 'bg-zinc-700'
+                : 'bg-zinc-300'
             }`}
-          />
-        </button>
+          >
+            <div
+              className={`absolute top-[3px] w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                isVisible ? 'translate-x-[24px]' : 'translate-x-[3px]'
+              }`}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Expandable settings */}
