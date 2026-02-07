@@ -47,23 +47,59 @@ export default function Header() {
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 top-full mt-1 w-48 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl py-1 z-50">
-                    <Link href="/profile" className="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white" onClick={() => setMenuOpen(false)}>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
+                      onClick={() => setMenuOpen(false)}
+                    >
                       Profiili
                     </Link>
-                    <Link href="/roadmap" className="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white" onClick={() => setMenuOpen(false)}>
+                    <Link
+                      href="/roadmap"
+                      className="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
+                      onClick={() => setMenuOpen(false)}
+                    >
                       Roadmap
                     </Link>
+                    <a
+                      href="https://datasuomi.fi"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      📊 DataSuomi.fi &rarr;
+                    </a>
                     <hr className="border-zinc-800 my-1" />
-                    <button onClick={() => { signOut(); setMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-zinc-400 hover:bg-white/10 hover:text-white">
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-zinc-400 hover:bg-white/10 hover:text-white"
+                    >
                       Kirjaudu ulos
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <Link href="/login" className="px-3 py-1.5 text-sm text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
-                Kirjaudu
-              </Link>
+              <>
+                <a
+                  href="https://datasuomi.fi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
+                >
+                  Tilastot &rarr;
+                </a>
+                <Link
+                  href="/login"
+                  className="px-3 py-1.5 text-sm text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
+                >
+                  Kirjaudu
+                </Link>
+              </>
             )}
           </div>
         )}
