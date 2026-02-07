@@ -189,11 +189,7 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
       await fetchData();
     };
 
-    if (map.isStyleLoaded()) {
-      initMap();
-    } else {
-      map.on('load', initMap);
-    }
+    initMap();
 
     const handleStyleLoad = async () => {
       await new Promise(resolve => setTimeout(resolve, 100));

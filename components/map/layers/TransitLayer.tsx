@@ -178,11 +178,7 @@ export default function TransitLayer({ map, onEventSelect }: TransitLayerProps) 
       }
     };
 
-    if (map.isStyleLoaded()) {
-      setup();
-    } else {
-      map.on('load', setup);
-    }
+    setup();
   }, [map, onEventSelect]);
 
   // Update data + filter by vehicle type

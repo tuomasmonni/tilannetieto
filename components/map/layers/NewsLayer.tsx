@@ -212,11 +212,7 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
       fetchData();
     };
 
-    if (map.isStyleLoaded()) {
-      initMap();
-    } else {
-      map.on('load', initMap);
-    }
+    initMap();
 
     const handleStyleLoad = async () => {
       await new Promise(resolve => setTimeout(resolve, 100));
