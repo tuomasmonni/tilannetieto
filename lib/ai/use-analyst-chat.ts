@@ -64,10 +64,12 @@ export function useAnalystChat(): UseAnalystChatReturn {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: newMessages.map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
+            messages: newMessages
+              .filter((m) => m.content.trim() !== '')
+              .map((m) => ({
+                role: m.role,
+                content: m.content,
+              })),
           }),
           signal: abortController.signal,
         });

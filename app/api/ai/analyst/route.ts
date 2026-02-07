@@ -87,12 +87,10 @@ export async function POST(request: Request) {
           messages: conversationMessages,
         });
 
-        // Process response content blocks
-        const assistantContent: Anthropic.ContentBlock[] = [];
+        // Stream text blocks and execute tools, collecting results
+        const toolResults: Anthropic.ToolResultBlockParam[] = [];
 
         for (const block of response.content) {
-          assistantContent.push(block);
-
           if (block.type === 'text') {
             send({ type: 'text', text: block.text });
           }
@@ -109,24 +107,11 @@ export async function POST(request: Request) {
 
               send({ type: 'tool_end', toolUseId: block.id });
 
-              // Feed tool result back to Claude
-              conversationMessages.push({
-                role: 'assistant',
-                content: assistantContent,
+              toolResults.push({
+                type: 'tool_result',
+                tool_use_id: block.id,
+                content: result,
               });
-              conversationMessages.push({
-                role: 'user',
-                content: [
-                  {
-                    type: 'tool_result',
-                    tool_use_id: block.id,
-                    content: result,
-                  },
-                ],
-              });
-
-              // Reset for next iteration - Claude will see tool results
-              assistantContent.length = 0;
             } catch (error) {
               send({ type: 'tool_end', toolUseId: block.id });
               send({
@@ -134,23 +119,12 @@ export async function POST(request: Request) {
                 error: `Työkalun ${block.name} suoritus epäonnistui: ${error instanceof Error ? error.message : 'tuntematon virhe'}`,
               });
 
-              // Feed error back to Claude so it can handle gracefully
-              conversationMessages.push({
-                role: 'assistant',
-                content: assistantContent,
+              toolResults.push({
+                type: 'tool_result',
+                tool_use_id: block.id,
+                content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                is_error: true,
               });
-              conversationMessages.push({
-                role: 'user',
-                content: [
-                  {
-                    type: 'tool_result',
-                    tool_use_id: block.id,
-                    content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                    is_error: true,
-                  },
-                ],
-              });
-              assistantContent.length = 0;
             }
           }
         }
@@ -160,7 +134,15 @@ export async function POST(request: Request) {
           break;
         }
 
-        // If there were tool uses, the loop continues with the results added
+        // Feed assistant response + tool results back for next iteration
+        conversationMessages.push({
+          role: 'assistant',
+          content: response.content,
+        });
+        conversationMessages.push({
+          role: 'user',
+          content: toolResults,
+        });
       }
 
       send({ type: 'done' });
