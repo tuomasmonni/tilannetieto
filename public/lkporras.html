@@ -449,7 +449,10 @@ body {
   padding: clamp(24px, 3vw, 40px) 24px;
   text-align: center;
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--white);
+  display: block;
 }
 .product-card:hover {
   border-color: var(--accent);
@@ -1021,48 +1024,48 @@ body {
     <h2 class="section-title" style="color:var(--white)" data-animate>Tuotevalikoima</h2>
     <p class="section-subtitle" style="color:var(--text-muted)" data-animate>Kattava valikoima teräsrakenteita yhdeltä toimittajalta</p>
     <div class="products-grid">
-      <div class="product-card" data-animate style="transition-delay:0ms">
+      <a href="https://lkporras.fi/tuotteet/kierreportaat/" class="product-card" data-animate style="transition-delay:0ms" target="_blank" rel="noopener">
         <div class="product-icon">
           <svg viewBox="0 0 48 48"><path d="M24 6c-6 0-10 4-10 4l10 14L34 10s-4-4-10-4z"/><path d="M14 10l3 8M34 10l-3 8"/><path d="M14 22v20M34 22v20"/><path d="M14 42h20"/><path d="M17 26h14M20 30h8M23 34h2"/></svg>
         </div>
         <h3>Kierreportaat</h3>
         <p>Tilaa säästävä ratkaisu vaativiin kohteisiin</p>
-      </div>
-      <div class="product-card" data-animate style="transition-delay:100ms">
+      </a>
+      <a href="https://lkporras.fi/tuotteet/terasportaat/" class="product-card" data-animate style="transition-delay:100ms" target="_blank" rel="noopener">
         <div class="product-icon">
           <svg viewBox="0 0 48 48"><path d="M8 42L40 42"/><path d="M12 42V10L36 10V42"/><path d="M18 42v-8h12v8"/><path d="M18 30h12M18 22h12M18 14h12"/></svg>
         </div>
         <h3>Teräsportaat</h3>
         <p>Kestävät ja modernit porrasratkaisut</p>
-      </div>
-      <div class="product-card" data-animate style="transition-delay:200ms">
+      </a>
+      <a href="https://lkporras.fi/tuotteet/paloportaat/" class="product-card" data-animate style="transition-delay:200ms" target="_blank" rel="noopener">
         <div class="product-icon">
           <svg viewBox="0 0 48 48"><path d="M6 42V12l18-6 18 6v30"/><path d="M6 42h36"/><path d="M16 42V24h16v18"/><path d="M24 24v18"/><path d="M10 16v4M38 16v4"/></svg>
         </div>
         <h3>Paloportaat</h3>
         <p>Turvallisuusmääräysten mukaiset hätäpoistumistiet</p>
-      </div>
-      <div class="product-card" data-animate style="transition-delay:300ms">
+      </a>
+      <a href="https://lkporras.fi/tuotteet/tasokaiteet/" class="product-card" data-animate style="transition-delay:300ms" target="_blank" rel="noopener">
         <div class="product-icon">
           <svg viewBox="0 0 48 48"><path d="M4 16h40"/><path d="M8 16v-6M16 16v-6M24 16v-6M32 16v-6M40 16v-6"/><path d="M6 16l-2 4M42 16l2 4"/></svg>
         </div>
         <h3>Tasokaiteet</h3>
         <p>Turvalliset kaidejärjestelmät tasoille ja kulkuteille</p>
-      </div>
-      <div class="product-card" data-animate style="transition-delay:400ms">
+      </a>
+      <a href="https://lkporras.fi/tuotteet/suojakehat/" class="product-card" data-animate style="transition-delay:400ms" target="_blank" rel="noopener">
         <div class="product-icon">
           <svg viewBox="0 0 48 48"><path d="M8 8h32v32H8z"/><path d="M8 8L24 24 40 8M8 40L24 24 40 40"/><path d="M8 24h32M24 8v32"/></svg>
         </div>
         <h3>Suojarakenteet</h3>
         <p>Suojakehät, turvaverkot ja suojaelementit</p>
-      </div>
-      <div class="product-card" data-animate style="transition-delay:500ms">
+      </a>
+      <a href="https://lkporras.fi/tuotteet/luiskat-ja-pyoratuolirampit/" class="product-card" data-animate style="transition-delay:500ms" target="_blank" rel="noopener">
         <div class="product-icon">
           <svg viewBox="0 0 48 48"><path d="M4 36L44 28"/><path d="M4 36v6h40v-14"/><path d="M4 36l8-2M20 32l8-2M36 28l8-2"/><path d="M12 34v8M28 30v12"/></svg>
         </div>
         <h3>Luiskat</h3>
         <p>Esteettömät kulkuratkaisut ja lastausrampit</p>
-      </div>
+      </a>
     </div>
   </div>
 </section>
@@ -1115,7 +1118,7 @@ body {
     <div class="pro-grid">
       <div class="pro-card" data-animate style="transition-delay:0ms" data-tilt>
         <div class="bg-num">01</div>
-        <h3>Suunnittelijat</h3>
+        <h3><a href="https://lkporras.fi/suunnittelijoille/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Suunnittelijat</a></h3>
         <div class="pro-target">Arkkitehdit, rakennesuunnittelijat, insinöörit</div>
         <p>Löydämme ratkaisut haastaviinkin kohteisiin ja autamme kulkuteitä koskevissa kysymyksissä.</p>
         <ul>
@@ -1123,10 +1126,11 @@ body {
           <li>Konsultointiapu kulkutiesuunnitteluun</li>
           <li>Nopea prosessi mallien ansiosta</li>
         </ul>
+        <a href="https://lkporras.fi/suunnittelijoille/" target="_blank" rel="noopener" style="display:inline-block;margin-top:16px;font-size:13px;color:var(--accent);text-decoration:none;font-weight:600">Lue lisää &rarr;</a>
       </div>
       <div class="pro-card" data-animate style="transition-delay:150ms" data-tilt>
         <div class="bg-num">02</div>
-        <h3>Rakennusliikkeet</h3>
+        <h3><a href="https://lkporras.fi/rakennusliikkeille/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Rakennusliikkeet</a></h3>
         <div class="pro-target">Urakoitsijat, projektinjohtajat</div>
         <p>Valmistamme teräsportaat ja niihin liittyvät rakenteet yli 50 vuoden kokemuksella.</p>
         <ul>
@@ -1134,10 +1138,11 @@ body {
           <li>Luotettavat toimitukset aikataulussa</li>
           <li>Oma asennuspalvelu tarvittaessa</li>
         </ul>
+        <a href="https://lkporras.fi/rakennusliikkeille/" target="_blank" rel="noopener" style="display:inline-block;margin-top:16px;font-size:13px;color:var(--accent);text-decoration:none;font-weight:600">Lue lisää &rarr;</a>
       </div>
       <div class="pro-card" data-animate style="transition-delay:300ms" data-tilt>
         <div class="bg-num">03</div>
-        <h3>Tehtaat</h3>
+        <h3><a href="https://lkporras.fi/tehtaat-konepajat/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Tehtaat</a></h3>
         <div class="pro-target">Teollisuuslaitokset, konepajat, tuotantolaitokset</div>
         <p>Valmistamme portaat mittojen mukaan — löydämme toimivan ja laadukkaan ratkaisun haastaviin kohteisiin.</p>
         <ul>
@@ -1145,6 +1150,7 @@ body {
           <li>Erikoisratkaisut vaativiin olosuhteisiin</li>
           <li>Teollisuuden laatuvaatimukset täyttyvät</li>
         </ul>
+        <a href="https://lkporras.fi/tehtaat-konepajat/" target="_blank" rel="noopener" style="display:inline-block;margin-top:16px;font-size:13px;color:var(--accent);text-decoration:none;font-weight:600">Lue lisää &rarr;</a>
       </div>
     </div>
   </div>
@@ -1234,7 +1240,7 @@ body {
         <a href="tel:+358407408001">040 740 8001</a>
       </div>
     </div>
-    <a href="https://www.lkporras.fi/ota-yhteytta" class="cta-button" data-animate target="_blank" rel="noopener">Pyydä tarjous</a>
+    <a href="https://lkporras.fi/yhteystiedot/" class="cta-button" data-animate target="_blank" rel="noopener">Pyydä tarjous</a>
   </div>
 </section>
 
