@@ -22,6 +22,7 @@ export default {
         'slide-down': 'slideDown 300ms ease-out',
         'expand': 'expand 200ms ease-out',
         'collapse': 'collapse 200ms ease-out',
+        'breathe': 'breathe 4s ease-in-out infinite',
       },
       keyframes: {
         slideUp: {

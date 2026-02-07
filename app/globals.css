@@ -186,3 +186,15 @@ body {
 .toggle-switch:active {
   transform: scale(0.95);
 }
+
+/* Sponsor badge breathing glow */
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.2;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.1));
+  }
+  50% {
+    opacity: 0.35;
+    filter: drop-shadow(0 0 12px rgba(147, 197, 253, 0.3));
+  }
+}

@@ -13,6 +13,7 @@ import BottomTabBar from '@/components/ui/BottomTabBar';
 import CategorySheet from '@/components/ui/CategorySheet';
 import ActiveGroupChip from '@/components/ui/ActiveGroupChip';
 import Legend from '@/components/ui/Legend';
+import SponsorBadge from '@/components/ui/SponsorBadge';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import MapContainer from '@/components/map/MapContainer';
 import CrimeLayer from '@/components/map/layers/CrimeLayer';
@@ -188,6 +189,11 @@ function AppContent() {
 
       {/* Mobile: Bottom tab bar */}
       <BottomTabBar onTabSelect={handleTabSelect} />
+
+      {/* Sponsor Badge - Bottom right, above Legend (desktop only) */}
+      <div className="absolute bottom-24 right-4 z-10 hidden lg:block">
+        <SponsorBadge />
+      </div>
 
       {/* Legend - Bottom right (hidden on mobile, visible on md+) */}
       <div className="absolute bottom-8 right-4 z-10 hidden lg:block">
