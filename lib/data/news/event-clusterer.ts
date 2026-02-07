@@ -94,7 +94,7 @@ async function aiCluster(articles: NewsArticle[]): Promise<{ clusters: number[][
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: 'claude-3-haiku-20240307',
           max_tokens: 2048,
           messages: [{
             role: 'user',
