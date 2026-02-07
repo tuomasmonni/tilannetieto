@@ -123,42 +123,33 @@ export async function fetchEnergyOverview(apiKey: string): Promise<EnergyOvervie
     { key: 'FI-NO',  id: FINGRID_DATASETS.transferFiNo.id },
   ];
 
-  // Hae kaikki rinnakkain (perusdata + rajasiirrot)
-  const [mainResults, transferResults] = await Promise.all([
-    Promise.allSettled(
-      Object.entries(datasetIds).map(async ([key, id]) => {
-        const point = await fetchLatestDatapoint(id, apiKey);
-        return { key, value: point?.value ?? 0, timestamp: point?.startTime ?? '' };
-      })
-    ),
-    Promise.allSettled(
-      transferDatasets.map(async ({ key, id }) => {
-        const point = await fetchLatestDatapoint(id, apiKey);
-        return { connection: key, value: point?.value ?? 0, timestamp: point?.startTime ?? '' };
-      })
-    ),
-  ]);
-
+  // Hae sarjassa (Fingrid rate limit: 10 req/min)
   const values: Record<string, number> = {};
   let latestTimestamp = '';
 
-  for (const result of mainResults) {
-    if (result.status === 'fulfilled') {
-      values[result.value.key] = result.value.value;
-      if (result.value.timestamp > latestTimestamp) {
-        latestTimestamp = result.value.timestamp;
+  for (const [key, id] of Object.entries(datasetIds)) {
+    try {
+      const point = await fetchLatestDatapoint(id, apiKey);
+      values[key] = point?.value ?? 0;
+      if (point?.startTime && point.startTime > latestTimestamp) {
+        latestTimestamp = point.startTime;
       }
+    } catch {
+      values[key] = 0;
     }
   }
 
   const transfers: CrossBorderTransfer[] = [];
-  for (const result of transferResults) {
-    if (result.status === 'fulfilled') {
+  for (const { key, id } of transferDatasets) {
+    try {
+      const point = await fetchLatestDatapoint(id, apiKey);
       transfers.push({
-        connection: result.value.connection,
-        value: result.value.value,
-        timestamp: result.value.timestamp,
+        connection: key,
+        value: point?.value ?? 0,
+        timestamp: point?.startTime ?? '',
       });
+    } catch {
+      transfers.push({ connection: key, value: 0, timestamp: '' });
     }
   }
 
