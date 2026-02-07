@@ -55,6 +55,7 @@ async function executeQueryMunicipalData(
 ): Promise<{ result: string }> {
   const supabase = getSupabase();
   const output: QueryMunicipalDataOutput = {};
+  const debugInfo: string[] = [];
 
   for (const slug of input.datasets) {
     // 1. Look up dataset by slug
@@ -65,11 +66,14 @@ async function executeQueryMunicipalData(
       .single();
 
     if (dsError || !dataset) {
+      debugInfo.push(`${slug}: dataset lookup failed: ${dsError?.message || 'not found'}`);
       output[slug] = [];
       continue;
     }
 
-    // 2. Query data_records
+    debugInfo.push(`${slug}: dataset_id=${dataset.id}`);
+
+    // 2. Query data_records (without year filter in SQL — vuosi is stored as number in JSONB)
     let query = supabase
       .from('data_records')
       .select('data')
@@ -82,27 +86,34 @@ async function executeQueryMunicipalData(
       query = query.in('data->>kunta_koodi', input.municipalities);
     }
 
-    // Filter by year if specified
-    if (input.year) {
-      query = query.eq('data->>vuosi', input.year);
-    }
-
     const { data: records, error: recError } = await query;
 
     if (recError || !records) {
+      debugInfo.push(`${slug}: query error: ${recError?.message || 'null result'}`);
       output[slug] = [];
       continue;
     }
 
-    output[slug] = records.map((r: { data: Record<string, unknown> }) => r.data as {
+    // Map to typed records
+    let filtered = records.map((r: { data: Record<string, unknown> }) => r.data as {
       kunta_koodi: string;
       kunta_nimi: string;
       vuosi: number;
       [key: string]: unknown;
     });
+
+    // Filter by year in JS (avoids JSONB text/number type mismatch)
+    if (input.year) {
+      const yearNum = parseInt(input.year);
+      filtered = filtered.filter((r) => r.vuosi === yearNum || String(r.vuosi) === input.year);
+      debugInfo.push(`${slug}: ${records.length} total, ${filtered.length} after year=${input.year}`);
+    } else {
+      debugInfo.push(`${slug}: ${filtered.length} records (no year filter)`);
+    }
+
+    output[slug] = filtered;
   }
 
-  // Return as a compact JSON string for Claude to analyze
   const summary = Object.entries(output).map(([slug, rows]) => {
     return `${slug}: ${rows.length} kuntaa`;
   });
@@ -110,6 +121,7 @@ async function executeQueryMunicipalData(
   return {
     result: JSON.stringify({
       summary: summary.join(', '),
+      debug: debugInfo,
       data: output,
     }),
   };
