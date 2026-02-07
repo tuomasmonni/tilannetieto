@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchHousingMapData } from '@/lib/data/housing/api';
+import { validateYear } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const year = request.nextUrl.searchParams.get('year') || '2024';
+  const year = validateYear(request.nextUrl.searchParams.get('year'), '2024');
 
   try {
     const data = await fetchHousingMapData(year);

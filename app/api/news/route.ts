@@ -10,6 +10,7 @@ import { fetchAllFeeds } from '@/lib/data/news/rss-parser';
 import { analyzeArticles } from '@/lib/data/news/news-analyzer';
 import { clusterArticles } from '@/lib/data/news/event-clusterer';
 import { getCached, setCached } from '@/lib/cache/redis';
+import { validateFormat, sanitizeSearch } from '@/lib/validation';
 import type { NewsArticle, NewsEvent, NewsCategory, NewsSource } from '@/lib/data/news/types';
 
 const REDIS_KEY = 'news:processed';
@@ -69,11 +70,11 @@ async function getData(): Promise<CachedNewsData> {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const format = searchParams.get('format') || 'geojson';
+    const format = validateFormat(searchParams.get('format'));
     const timeRange = searchParams.get('timeRange') || '24h';
     const sourcesParam = searchParams.get('sources');
     const categoriesParam = searchParams.get('categories');
-    const searchQuery = searchParams.get('search');
+    const searchQuery = sanitizeSearch(searchParams.get('search'));
 
     const { articles: allArticles, events: allEvents, singleArticles: allSingles } = await getData();
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchCrimeMapData, fetchAvailableYears } from '@/lib/data/crime/api';
+import { validateYear } from '@/lib/validation';
 
 export const revalidate = 3600; // ISR: 1h cache (static data)
 
@@ -15,7 +16,7 @@ export const revalidate = 3600; // ISR: 1h cache (static data)
  */
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const year = searchParams.get('year') || '2023';
+  const year = validateYear(searchParams.get('year'), '2023');
 
   try {
     const data = await fetchCrimeMapData(year);

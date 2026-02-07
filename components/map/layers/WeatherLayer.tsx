@@ -6,6 +6,7 @@ import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
 import { loadMapIcons } from '@/lib/map-icons';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface WeatherLayerProps {
   map: MapboxMap;
@@ -19,6 +20,7 @@ const ICONS_LAYER = 'weather-icons';
 
 export default function WeatherLayer({ map, onEventSelect }: WeatherLayerProps) {
   const { weather } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [data, setData] = useState<EventFeatureCollection | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -35,15 +37,15 @@ export default function WeatherLayer({ map, onEventSelect }: WeatherLayerProps) 
     }
   };
 
-  // Init polling - only when layer is visible
+  // Init polling - only when layer is visible and page is active
   useEffect(() => {
-    if (!weather.layerVisible) return;
+    if (!weather.layerVisible || !isPageVisible) return;
     fetchData();
     intervalRef.current = setInterval(fetchData, POLLING_INTERVALS.weather);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [weather.layerVisible]);
+  }, [weather.layerVisible, isPageVisible]);
 
   // Setup source & layers + update data
   useEffect(() => {

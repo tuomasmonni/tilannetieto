@@ -5,6 +5,7 @@ import type { Map as MapboxMap } from 'mapbox-gl';
 import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface IceLayerProps {
   map: MapboxMap;
@@ -33,6 +34,7 @@ const WMS_URL =
 
 export default function IceLayer({ map, onEventSelect }: IceLayerProps) {
   const { ice } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [lakeData, setLakeData] = useState<EventFeatureCollection | null>(null);
   const [breakerData, setBreakerData] = useState<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,9 +65,9 @@ export default function IceLayer({ map, onEventSelect }: IceLayerProps) {
     }
   };
 
-  // Polling
+  // Polling - only when visible and page active
   useEffect(() => {
-    if (!ice.layerVisible) return;
+    if (!ice.layerVisible || !isPageVisible) return;
     fetchLakeData();
     fetchBreakerData();
     intervalRef.current = setInterval(() => {
@@ -75,7 +77,7 @@ export default function IceLayer({ map, onEventSelect }: IceLayerProps) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [ice.layerVisible]);
+  }, [ice.layerVisible, isPageVisible]);
 
   // ─── Lake ice: source + layers ───
   useEffect(() => {

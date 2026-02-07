@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Map as MapboxMap, GeoJSONSource } from 'mapbox-gl';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EnergyOverview, CrossBorderTransfer } from '@/lib/data/fingrid/client';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface EnergyTransferLayerProps {
   map: MapboxMap;
@@ -66,6 +67,7 @@ function buildLabelGeoJSON(
 
 export default function EnergyTransferLayer({ map }: EnergyTransferLayerProps) {
   const { energy } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [transfers, setTransfers] = useState<CrossBorderTransfer[]>([]);
   const layersAdded = useRef(false);
 
@@ -82,13 +84,13 @@ export default function EnergyTransferLayer({ map }: EnergyTransferLayerProps) {
     }
   }, []);
 
-  // Polling
+  // Polling - only when visible and page active
   useEffect(() => {
-    if (!energy.layerVisible) return;
+    if (!energy.layerVisible || !isPageVisible) return;
     fetchData();
     const interval = setInterval(fetchData, REFRESH_INTERVAL);
     return () => clearInterval(interval);
-  }, [energy.layerVisible, fetchData]);
+  }, [energy.layerVisible, isPageVisible, fetchData]);
 
   // Map sources & layers
   useEffect(() => {

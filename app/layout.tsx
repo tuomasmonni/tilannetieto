@@ -1,8 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
+import { validateEnv } from '@/lib/env';
 import Providers from './providers';
 import './globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
+
+// Validate env vars at startup (server-side only)
+validateEnv();
 
 export const viewport: Viewport = {
   width: 'device-width',

@@ -6,6 +6,7 @@ import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
 import { loadMapIcons } from '@/lib/map-icons';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface TransitLayerProps {
   map: MapboxMap;
@@ -19,6 +20,7 @@ const ICONS_LAYER = 'transit-icons';
 
 export default function TransitLayer({ map, onEventSelect }: TransitLayerProps) {
   const { transit } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [allData, setAllData] = useState<EventFeatureCollection | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const vehicleTypesRef = useRef(transit.vehicleTypes);
@@ -40,15 +42,15 @@ export default function TransitLayer({ map, onEventSelect }: TransitLayerProps) 
     }
   };
 
-  // Init polling (15s for real-time transit data) - only when visible
+  // Init polling (15s for real-time transit data) - only when visible and page active
   useEffect(() => {
-    if (!transit.layerVisible) return;
+    if (!transit.layerVisible || !isPageVisible) return;
     fetchData();
     intervalRef.current = setInterval(fetchData, POLLING_INTERVALS.transit);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [transit.layerVisible]);
+  }, [transit.layerVisible, isPageVisible]);
 
   // Setup source & layers
   useEffect(() => {

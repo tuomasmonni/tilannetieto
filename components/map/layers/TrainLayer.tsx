@@ -6,6 +6,7 @@ import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
 import { loadMapIcons } from '@/lib/map-icons';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface TrainLayerProps {
   map: MapboxMap;
@@ -19,6 +20,7 @@ const ICONS_LAYER = 'train-icons';
 
 export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
   const { train } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [allData, setAllData] = useState<EventFeatureCollection | null>(null);
   const [layersReady, setLayersReady] = useState(false);
   const fetchDataRef = useRef<(() => Promise<void>) | null>(null);
@@ -27,6 +29,11 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
   useEffect(() => {
     layerVisibleRef.current = train.layerVisible;
   }, [train.layerVisible]);
+
+  const isPageVisibleRef = useRef(isPageVisible);
+  useEffect(() => {
+    isPageVisibleRef.current = isPageVisible;
+  }, [isPageVisible]);
 
   // Map setup
   useEffect(() => {
@@ -220,7 +227,7 @@ export default function TrainLayer({ map, onEventSelect }: TrainLayerProps) {
     map.on('mouseleave', CLUSTER_LAYER, handleMouseLeave);
 
     const interval = setInterval(() => {
-      if (!layerVisibleRef.current) return;
+      if (!layerVisibleRef.current || !isPageVisibleRef.current) return;
       fetchData();
     }, POLLING_INTERVALS.trains);
 

@@ -6,6 +6,7 @@ import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
 import { loadMapIcons } from '@/lib/map-icons';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface SnowLayerProps {
   map: MapboxMap;
@@ -20,6 +21,7 @@ const LABELS_LAYER = 'snow-labels';
 
 export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
   const { snow } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [data, setData] = useState<EventFeatureCollection | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,15 +38,15 @@ export default function SnowLayer({ map, onEventSelect }: SnowLayerProps) {
     }
   };
 
-  // Init polling - only when layer is visible
+  // Init polling - only when layer is visible and page active
   useEffect(() => {
-    if (!snow.layerVisible) return;
+    if (!snow.layerVisible || !isPageVisible) return;
     fetchData();
     intervalRef.current = setInterval(fetchData, POLLING_INTERVALS.snow);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [snow.layerVisible]);
+  }, [snow.layerVisible, isPageVisible]);
 
   // Setup source & layers + update data (combined to avoid race condition)
   useEffect(() => {

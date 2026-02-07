@@ -28,16 +28,20 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user && (request.nextUrl.pathname.startsWith('/roadmap') || request.nextUrl.pathname.startsWith('/profile'))) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
-  }
+    if (!user && (request.nextUrl.pathname.startsWith('/roadmap') || request.nextUrl.pathname.startsWith('/profile'))) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-    return NextResponse.redirect(new URL('/roadmap', request.url));
+    if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+      return NextResponse.redirect(new URL('/roadmap', request.url));
+    }
+  } catch (error) {
+    console.error('Middleware auth error:', error);
   }
 
   return supabaseResponse;

@@ -2,20 +2,26 @@
  * Tilannetieto.fi - Traffic API Route
  * Fintraffic liikenneilmoitukset → EventFeatureCollection
  *
- * NOTE: Redis cache disabled — Upstash REST API response format
- * caused double-serialization. Using Vercel edge cache (max-age=60) instead.
+ * Redis cache: 60s TTL + Vercel edge cache (max-age=60)
  */
 
 import { NextResponse } from 'next/server';
 import { fetchAllTrafficMessages } from '@/lib/data/traffic/client';
 import { transformTrafficToEventFeatures } from '@/lib/data/traffic/transform';
+import { getOrFetch } from '@/lib/cache/redis';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const rawData = await fetchAllTrafficMessages();
-    const featureCollection = transformTrafficToEventFeatures(rawData);
+    const featureCollection = await getOrFetch(
+      'traffic:all',
+      async () => {
+        const rawData = await fetchAllTrafficMessages();
+        return transformTrafficToEventFeatures(rawData);
+      },
+      60
+    );
 
     console.log(`Traffic API: ${featureCollection.features?.length ?? 0} events`);
 

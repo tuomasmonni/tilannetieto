@@ -6,6 +6,7 @@ import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import { loadMapIcons } from '@/lib/map-icons';
 import type { WeatherCameraStation } from '@/lib/data/weathercam/types';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface WeatherCameraLayerProps {
   map: MapboxMap;
@@ -13,6 +14,7 @@ interface WeatherCameraLayerProps {
 
 export default function WeatherCameraLayer({ map }: WeatherCameraLayerProps) {
   const { weatherCamera, setSelectedWeatherCamera } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [stations, setStations] = useState<WeatherCameraStation[]>([]);
   const [loading, setLoading] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -40,9 +42,9 @@ export default function WeatherCameraLayer({ map }: WeatherCameraLayerProps) {
     }
   };
 
-  // Alusta polling - only when layer is visible
+  // Alusta polling - only when layer is visible and page active
   useEffect(() => {
-    if (!weatherCamera.layerVisible) return;
+    if (!weatherCamera.layerVisible || !isPageVisible) return;
     fetchStations();
     intervalRef.current = setInterval(
       fetchStations,
@@ -52,7 +54,7 @@ export default function WeatherCameraLayer({ map }: WeatherCameraLayerProps) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [weatherCamera.layerVisible]);
+  }, [weatherCamera.layerVisible, isPageVisible]);
 
   // Päivitä kartan layer-tiedot
   useEffect(() => {

@@ -6,6 +6,7 @@ import { POLLING_INTERVALS } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
 import { loadMapIcons } from '@/lib/map-icons';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface RoadWeatherLayerProps {
   map: MapboxMap;
@@ -20,6 +21,7 @@ const PULSE_LAYER = 'road-weather-pulse';
 
 export default function RoadWeatherLayer({ map, onEventSelect }: RoadWeatherLayerProps) {
   const { roadWeather } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [data, setData] = useState<EventFeatureCollection | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,15 +38,15 @@ export default function RoadWeatherLayer({ map, onEventSelect }: RoadWeatherLaye
     }
   };
 
-  // Init polling - only when layer is visible
+  // Init polling - only when layer is visible and page active
   useEffect(() => {
-    if (!roadWeather.layerVisible) return;
+    if (!roadWeather.layerVisible || !isPageVisible) return;
     fetchData();
     intervalRef.current = setInterval(fetchData, POLLING_INTERVALS.roadWeather);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [roadWeather.layerVisible]);
+  }, [roadWeather.layerVisible, isPageVisible]);
 
   // Setup source & layers + update data
   useEffect(() => {

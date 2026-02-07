@@ -6,6 +6,7 @@ import { EVENT_CATEGORIES, POLLING_INTERVALS, type EventCategory } from '@/lib/c
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventFeatureCollection, EventDetails } from '@/lib/types';
 import { loadMapIcons } from '@/lib/map-icons';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface TrafficLayerProps {
   map: MapboxMap;
@@ -45,6 +46,7 @@ const filterByCategory = (data: EventFeatureCollection, categories: EventCategor
 
 export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) {
   const { traffic } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [allData, setAllData] = useState<EventFeatureCollection | null>(null);
   const [layersReady, setLayersReady] = useState(false);
   const filtersRef = useRef(traffic);
@@ -57,6 +59,11 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
   useEffect(() => {
     layerVisibleRef.current = traffic?.layerVisible;
   }, [traffic?.layerVisible]);
+
+  const isPageVisibleRef = useRef(isPageVisible);
+  useEffect(() => {
+    isPageVisibleRef.current = isPageVisible;
+  }, [isPageVisible]);
 
   const fetchDataRef = useRef<(() => Promise<void>) | null>(null);
 
@@ -254,7 +261,7 @@ export default function TrafficLayer({ map, onEventSelect }: TrafficLayerProps) 
     map.on('click', 'traffic-events-icons', handleClick);
 
     const interval = setInterval(() => {
-      if (!layerVisibleRef.current) return;
+      if (!layerVisibleRef.current || !isPageVisibleRef.current) return;
       fetchData();
     }, POLLING_INTERVALS.traffic);
 

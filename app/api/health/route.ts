@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchIndicatorByMunicipality } from '@/lib/data/sotkanet/client';
 import { getOrFetch } from '@/lib/cache/redis';
 import { fetchMunicipalityBoundaries } from '@/lib/data/crime/api';
+import { validateYear } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ function categorizeByQuantile(value: number, allValues: number[]): 'low' | 'medi
 
 export async function GET(request: NextRequest) {
   const indicator = request.nextUrl.searchParams.get('indicator') || '3064';
-  const year = request.nextUrl.searchParams.get('year') || '2023';
+  const year = validateYear(request.nextUrl.searchParams.get('year'), '2023');
 
   try {
     const [boundaries, indicatorData] = await Promise.all([

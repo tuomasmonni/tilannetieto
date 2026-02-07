@@ -5,6 +5,7 @@ import type { Map as MapboxMap } from 'mapbox-gl';
 import { NEWS_CATEGORIES, POLLING_INTERVALS, type NewsCategoryKey } from '@/lib/constants';
 import { useUnifiedFilters } from '@/lib/contexts/UnifiedFilterContext';
 import type { EventDetails } from '@/lib/types';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 interface NewsLayerProps {
   map: MapboxMap;
@@ -52,6 +53,7 @@ const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
 
 export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
   const { news } = useUnifiedFilters();
+  const isPageVisible = usePageVisibility();
   const [allData, setAllData] = useState<NewsGeoJSON | null>(null);
   const [layersReady, setLayersReady] = useState(false);
   const fetchDataRef = useRef<(() => Promise<void>) | null>(null);
@@ -65,6 +67,11 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
   useEffect(() => {
     layerVisibleRef.current = news?.layerVisible;
   }, [news?.layerVisible]);
+
+  const isPageVisibleRef = useRef(isPageVisible);
+  useEffect(() => {
+    isPageVisibleRef.current = isPageVisible;
+  }, [isPageVisible]);
 
   // Build query params from filters
   const buildQueryParams = () => {
@@ -293,7 +300,7 @@ export default function NewsLayer({ map, onEventSelect }: NewsLayerProps) {
 
     // Polling
     const interval = setInterval(() => {
-      if (!layerVisibleRef.current) return;
+      if (!layerVisibleRef.current || !isPageVisibleRef.current) return;
       fetchData();
     }, POLLING_INTERVALS.news);
 
