@@ -91,11 +91,11 @@ export async function fetchLatestDatapoint(
       'x-api-key': apiKey,
       'Accept': 'application/json',
     },
-    next: { revalidate: 300 }, // 5 min ISR cache
+    cache: 'no-store', // Ei ISR-cachea — route-tason Cache-Control hoitaa
   });
 
   if (!response.ok) {
-    console.error(`Fingrid API error for dataset ${datasetId}: ${response.status}`);
+    console.error(`Fingrid API error for dataset ${datasetId}: ${response.status} ${response.statusText}`);
     return null;
   }
 
@@ -131,7 +131,7 @@ export async function fetchEnergyOverview(apiKey: string): Promise<EnergyOvervie
   const entries = Object.entries(datasetIds);
   for (let i = 0; i < entries.length; i++) {
     const [key, id] = entries[i];
-    if (i > 0) await delay(800);
+    if (i > 0) await delay(3000);
     try {
       const point = await fetchLatestDatapoint(id, apiKey);
       values[key] = point?.value ?? 0;
@@ -146,7 +146,7 @@ export async function fetchEnergyOverview(apiKey: string): Promise<EnergyOvervie
   const transfers: CrossBorderTransfer[] = [];
   for (let i = 0; i < transferDatasets.length; i++) {
     const { key, id } = transferDatasets[i];
-    await delay(800);
+    await delay(3000);
     try {
       const point = await fetchLatestDatapoint(id, apiKey);
       transfers.push({
