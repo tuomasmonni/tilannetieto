@@ -1,4 +1,9 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+import bundleAnalyzer from '@next/bundle-analyzer';
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -34,7 +39,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' data:",
               "connect-src 'self' https://*.mapbox.com https://*.digitraffic.fi https://*.stat.fi https://*.supabase.co https://sotkanet.fi https://data.fingrid.fi https://rajapinnat.ymparisto.fi https://feeds.yle.fi https://va.vercel-scripts.com https://geo.stat.fi https://meri.digitraffic.fi",
               "worker-src 'self' blob:",
-              "child-src blob:",
+              'child-src blob:',
               "frame-ancestors 'none'",
             ].join('; '),
           },
@@ -44,4 +49,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);
