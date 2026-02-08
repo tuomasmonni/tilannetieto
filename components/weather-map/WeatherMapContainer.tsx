@@ -295,9 +295,16 @@ export default function WeatherMapContainer() {
   );
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-zinc-950">
+    <div
+      className="relative w-full h-full overflow-hidden bg-zinc-950"
+      style={{ minHeight: '100vh' }}
+    >
       {/* Map */}
-      <div ref={mapContainerRef} className="absolute inset-0" />
+      <div
+        ref={mapContainerRef}
+        className="absolute inset-0"
+        style={{ width: '100%', height: '100%' }}
+      />
 
       {/* Loading */}
       {!mapReady && (
