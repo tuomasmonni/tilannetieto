@@ -16,6 +16,16 @@ export default function SidebarFooter({ collapsed }: SidebarFooterProps) {
   if (collapsed) {
     return (
       <div className={`p-2 border-t ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+        <Link
+          href="/saakartta"
+          className={`block w-full p-2 rounded-lg text-center transition-colors ${
+            isDark ? 'hover:bg-white/10 text-cyan-400' : 'hover:bg-black/10 text-cyan-600'
+          }`}
+          aria-label="Saakartta"
+          title="Saakartta"
+        >
+          🌦️
+        </Link>
         <a
           href="https://datasuomi.fi"
           target="_blank"
@@ -98,6 +108,20 @@ export default function SidebarFooter({ collapsed }: SidebarFooterProps) {
           Kirjaudu sisään
         </Link>
       )}
+      <Link
+        href="/saakartta"
+        className={`flex items-center gap-2 px-2 py-1.5 mb-1 rounded-lg text-xs transition-colors ${
+          isDark
+            ? 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300'
+            : 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 hover:text-cyan-900'
+        }`}
+      >
+        <span>🌦️</span>
+        <span>Saakartta</span>
+        <span className={`ml-auto text-[10px] ${isDark ? 'text-zinc-600' : 'text-zinc-400'}`}>
+          &rarr;
+        </span>
+      </Link>
       <a
         href="https://datasuomi.fi"
         target="_blank"
