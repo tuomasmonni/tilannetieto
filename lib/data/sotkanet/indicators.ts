@@ -50,10 +50,10 @@ export const SOTKANET_INDICATORS: SotkanetIndicator[] = [
     colorScale: 'greenToRed',
   },
   {
-    id: '5',
-    label: 'Toimeentulotuki',
-    description: 'Toimeentulotukea saaneet 25–64-vuotiaat, % vastaavanikäisestä väestöstä',
-    unit: '%',
+    id: '5659',
+    label: 'Alkoholisairastavuus',
+    description: 'Alkoholisairastavuusindeksi, ikävakioitu (koko maa = 100)',
+    unit: 'indeksi',
     colorScale: 'greenToRed',
   },
 ];
