@@ -295,10 +295,7 @@ export default function WeatherMapContainer() {
   );
 
   return (
-    <div
-      className="relative w-full h-full overflow-hidden bg-zinc-950"
-      style={{ minHeight: '100vh' }}
-    >
+    <div className="relative w-full h-screen overflow-hidden bg-zinc-950">
       {/* Map */}
       <div
         ref={mapContainerRef}
