@@ -30,6 +30,9 @@ export function renderTemperatureIDW(
   const ctx = canvas.getContext('2d');
   if (!ctx || stations.length === 0) return;
 
+  // Guard against zero-size canvas (createImageData throws if w or h is 0)
+  if (canvas.width <= 0 || canvas.height <= 0) return;
+
   const w = canvas.width;
   const h = canvas.height;
   const { step, maxDistance, power } = IDW_CONFIG;

@@ -85,6 +85,10 @@ export default function WeatherMapContainer() {
       setMapReady(true);
     });
 
+    map.on('error', (e) => {
+      console.error('Mapbox error:', e.error);
+    });
+
     return () => {
       map.remove();
       mapRef.current = null;
@@ -158,68 +162,72 @@ export default function WeatherMapContainer() {
     const map = mapRef.current;
     if (!map || !mapReady || state.observations.length === 0) return;
 
-    const geojson: GeoJSON.FeatureCollection = {
-      type: 'FeatureCollection',
-      features: state.observations
-        .filter((obs) => obs.temperature !== null)
-        .map((obs) => ({
-          type: 'Feature' as const,
-          geometry: {
-            type: 'Point' as const,
-            coordinates: [obs.lon, obs.lat],
+    try {
+      const geojson: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: state.observations
+          .filter((obs) => obs.temperature !== null)
+          .map((obs) => ({
+            type: 'Feature' as const,
+            geometry: {
+              type: 'Point' as const,
+              coordinates: [obs.lon, obs.lat],
+            },
+            properties: {
+              id: obs.id,
+              name: obs.stationName,
+              temperature: obs.temperature,
+              windSpeed: obs.windSpeed,
+              source: obs.source,
+            },
+          })),
+      };
+
+      const source = map.getSource(STATION_SOURCE) as mapboxgl.GeoJSONSource;
+      if (source) {
+        source.setData(geojson);
+      } else {
+        map.addSource(STATION_SOURCE, { type: 'geojson', data: geojson });
+        map.addLayer({
+          id: STATION_LAYER,
+          type: 'circle',
+          source: STATION_SOURCE,
+          paint: {
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 2, 8, 3, 12, 5],
+            'circle-color': '#ffffff',
+            'circle-stroke-color': '#000000',
+            'circle-stroke-width': 0.5,
+            'circle-opacity': 0.7,
           },
-          properties: {
-            id: obs.id,
-            name: obs.stationName,
-            temperature: obs.temperature,
-            windSpeed: obs.windSpeed,
-            source: obs.source,
-          },
-        })),
-    };
+        });
 
-    const source = map.getSource(STATION_SOURCE) as mapboxgl.GeoJSONSource;
-    if (source) {
-      source.setData(geojson);
-    } else {
-      map.addSource(STATION_SOURCE, { type: 'geojson', data: geojson });
-      map.addLayer({
-        id: STATION_LAYER,
-        type: 'circle',
-        source: STATION_SOURCE,
-        paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 2, 8, 3, 12, 5],
-          'circle-color': '#ffffff',
-          'circle-stroke-color': '#000000',
-          'circle-stroke-width': 0.5,
-          'circle-opacity': 0.7,
-        },
-      });
+        // Click handler
+        map.on('click', STATION_LAYER, (e) => {
+          const feature = e.features?.[0];
+          if (!feature || !feature.properties) return;
 
-      // Click handler
-      map.on('click', STATION_LAYER, (e) => {
-        const feature = e.features?.[0];
-        if (!feature || !feature.properties) return;
+          const obs = state.observations.find((o) => o.id === feature.properties!.id);
+          if (obs) setSelectedStation(obs);
+        });
 
-        const obs = state.observations.find((o) => o.id === feature.properties!.id);
-        if (obs) setSelectedStation(obs);
-      });
+        map.on('mouseenter', STATION_LAYER, () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', STATION_LAYER, () => {
+          map.getCanvas().style.cursor = '';
+        });
+      }
 
-      map.on('mouseenter', STATION_LAYER, () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      map.on('mouseleave', STATION_LAYER, () => {
-        map.getCanvas().style.cursor = '';
-      });
-    }
-
-    // Update visibility
-    if (map.getLayer(STATION_LAYER)) {
-      map.setLayoutProperty(
-        STATION_LAYER,
-        'visibility',
-        state.stationsVisible ? 'visible' : 'none'
-      );
+      // Update visibility
+      if (map.getLayer(STATION_LAYER)) {
+        map.setLayoutProperty(
+          STATION_LAYER,
+          'visibility',
+          state.stationsVisible ? 'visible' : 'none'
+        );
+      }
+    } catch (err) {
+      console.error('Station dots error:', err);
     }
   }, [mapReady, state.observations, state.stationsVisible, setSelectedStation]);
 

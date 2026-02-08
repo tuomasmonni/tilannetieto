@@ -28,48 +28,53 @@ export default function TemperatureOverlay({
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const render = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !map) return;
+    try {
+      const canvas = canvasRef.current;
+      if (!canvas || !map) return;
 
-    const container = map.getContainer();
-    const w = container.clientWidth;
-    const h = container.clientHeight;
+      const container = map.getContainer();
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w <= 0 || h <= 0) return;
 
-    // Resize canvas if needed
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
+      // Resize canvas if needed
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+
+      const project = (lngLat: [number, number]) => map.project(lngLat);
+
+      let dataToRender: WeatherMapObservation[];
+
+      if (forecastMode && forecast.length > 0) {
+        // Use forecast data: convert grid points to pseudo-observations
+        dataToRender = forecast.map((point) => ({
+          id: `fc_${point.lat}_${point.lon}`,
+          lat: point.lat,
+          lon: point.lon,
+          temperature: point.hours[forecastHourIndex]?.temperature ?? null,
+          windSpeed: point.hours[forecastHourIndex]?.windSpeed ?? null,
+          windDirection: point.hours[forecastHourIndex]?.windDirection ?? null,
+          humidity: null,
+          precipitation: null,
+          roadTemperature: null,
+          visibility: null,
+          stationName: '',
+          source: 'fmi' as const,
+          timestamp: point.hours[forecastHourIndex]?.time ?? '',
+        }));
+      } else {
+        dataToRender = observations;
+      }
+
+      const stations = observationsToPixelStations(dataToRender, project, 'temperature');
+
+      const alpha = Math.round(opacity * 255);
+      renderTemperatureIDW(canvas, stations, alpha);
+    } catch (err) {
+      console.error('TemperatureOverlay render error:', err);
     }
-
-    const project = (lngLat: [number, number]) => map.project(lngLat);
-
-    let dataToRender: WeatherMapObservation[];
-
-    if (forecastMode && forecast.length > 0) {
-      // Use forecast data: convert grid points to pseudo-observations
-      dataToRender = forecast.map((point) => ({
-        id: `fc_${point.lat}_${point.lon}`,
-        lat: point.lat,
-        lon: point.lon,
-        temperature: point.hours[forecastHourIndex]?.temperature ?? null,
-        windSpeed: point.hours[forecastHourIndex]?.windSpeed ?? null,
-        windDirection: point.hours[forecastHourIndex]?.windDirection ?? null,
-        humidity: null,
-        precipitation: null,
-        roadTemperature: null,
-        visibility: null,
-        stationName: '',
-        source: 'fmi' as const,
-        timestamp: point.hours[forecastHourIndex]?.time ?? '',
-      }));
-    } else {
-      dataToRender = observations;
-    }
-
-    const stations = observationsToPixelStations(dataToRender, project, 'temperature');
-
-    const alpha = Math.round(opacity * 255);
-    renderTemperatureIDW(canvas, stations, alpha);
   }, [map, observations, forecast, forecastMode, forecastHourIndex, opacity]);
 
   // Render on data change

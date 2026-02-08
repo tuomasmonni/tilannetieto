@@ -40,43 +40,48 @@ export default function RadarOverlay({
   useEffect(() => {
     if (!map || frames.length === 0) return;
 
-    const { bounds } = RADAR_CONFIG;
-    const currentUrl = frames[frameIndex]?.url;
-    if (!currentUrl) return;
+    try {
+      const { bounds } = RADAR_CONFIG;
+      const currentUrl = frames[frameIndex]?.url;
+      if (!currentUrl) return;
 
-    const coordinates: [[number, number], [number, number], [number, number], [number, number]] = [
-      [bounds.west, bounds.north], // top-left
-      [bounds.east, bounds.north], // top-right
-      [bounds.east, bounds.south], // bottom-right
-      [bounds.west, bounds.south], // bottom-left
-    ];
+      const coordinates: [[number, number], [number, number], [number, number], [number, number]] =
+        [
+          [bounds.west, bounds.north], // top-left
+          [bounds.east, bounds.north], // top-right
+          [bounds.east, bounds.south], // bottom-right
+          [bounds.west, bounds.south], // bottom-left
+        ];
 
-    const source = map.getSource(RADAR_SOURCE) as mapboxgl.ImageSource;
+      const source = map.getSource(RADAR_SOURCE) as mapboxgl.ImageSource;
 
-    if (source) {
-      source.updateImage({ url: currentUrl, coordinates });
-    } else {
-      map.addSource(RADAR_SOURCE, {
-        type: 'image',
-        url: currentUrl,
-        coordinates,
-      });
+      if (source) {
+        source.updateImage({ url: currentUrl, coordinates });
+      } else {
+        map.addSource(RADAR_SOURCE, {
+          type: 'image',
+          url: currentUrl,
+          coordinates,
+        });
 
-      map.addLayer({
-        id: RADAR_LAYER,
-        type: 'raster',
-        source: RADAR_SOURCE,
-        paint: {
-          'raster-opacity': opacity,
-          'raster-fade-duration': 0,
-        },
-      });
-    }
+        map.addLayer({
+          id: RADAR_LAYER,
+          type: 'raster',
+          source: RADAR_SOURCE,
+          paint: {
+            'raster-opacity': opacity,
+            'raster-fade-duration': 0,
+          },
+        });
+      }
 
-    // Update visibility
-    if (map.getLayer(RADAR_LAYER)) {
-      map.setLayoutProperty(RADAR_LAYER, 'visibility', visible ? 'visible' : 'none');
-      map.setPaintProperty(RADAR_LAYER, 'raster-opacity', opacity);
+      // Update visibility
+      if (map.getLayer(RADAR_LAYER)) {
+        map.setLayoutProperty(RADAR_LAYER, 'visibility', visible ? 'visible' : 'none');
+        map.setPaintProperty(RADAR_LAYER, 'raster-opacity', opacity);
+      }
+    } catch (err) {
+      console.error('RadarOverlay error:', err);
     }
   }, [map, frames, frameIndex, visible, opacity]);
 

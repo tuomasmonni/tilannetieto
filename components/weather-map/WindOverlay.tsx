@@ -29,44 +29,49 @@ export default function WindOverlay({
   const isMovingRef = useRef(false);
 
   const updateWindField = useCallback(() => {
-    const system = systemRef.current;
-    const canvas = canvasRef.current;
-    if (!system || !canvas || !map) return;
+    try {
+      const system = systemRef.current;
+      const canvas = canvasRef.current;
+      if (!system || !canvas || !map) return;
 
-    const container = map.getContainer();
-    const w = container.clientWidth;
-    const h = container.clientHeight;
+      const container = map.getContainer();
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w <= 0 || h <= 0) return;
 
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+
+      const project = (lngLat: [number, number]) => map.project(lngLat);
+
+      let dataToUse: WeatherMapObservation[];
+
+      if (forecastMode && forecast.length > 0) {
+        dataToUse = forecast.map((point) => ({
+          id: `fc_${point.lat}_${point.lon}`,
+          lat: point.lat,
+          lon: point.lon,
+          temperature: null,
+          windSpeed: point.hours[forecastHourIndex]?.windSpeed ?? null,
+          windDirection: point.hours[forecastHourIndex]?.windDirection ?? null,
+          humidity: null,
+          precipitation: null,
+          roadTemperature: null,
+          visibility: null,
+          stationName: '',
+          source: 'fmi' as const,
+          timestamp: '',
+        }));
+      } else {
+        dataToUse = observations;
+      }
+
+      system.updateWindField(dataToUse, project, w, h);
+    } catch (err) {
+      console.error('WindOverlay updateWindField error:', err);
     }
-
-    const project = (lngLat: [number, number]) => map.project(lngLat);
-
-    let dataToUse: WeatherMapObservation[];
-
-    if (forecastMode && forecast.length > 0) {
-      dataToUse = forecast.map((point) => ({
-        id: `fc_${point.lat}_${point.lon}`,
-        lat: point.lat,
-        lon: point.lon,
-        temperature: null,
-        windSpeed: point.hours[forecastHourIndex]?.windSpeed ?? null,
-        windDirection: point.hours[forecastHourIndex]?.windDirection ?? null,
-        humidity: null,
-        precipitation: null,
-        roadTemperature: null,
-        visibility: null,
-        stationName: '',
-        source: 'fmi' as const,
-        timestamp: '',
-      }));
-    } else {
-      dataToUse = observations;
-    }
-
-    system.updateWindField(dataToUse, project, w, h);
   }, [map, observations, forecast, forecastMode, forecastHourIndex]);
 
   // Initialize particle system
