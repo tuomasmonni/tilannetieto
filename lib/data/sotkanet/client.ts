@@ -5,7 +5,7 @@
  * Lisenssi: CC BY 4.0 (maininta THL/Sotkanet vaadittu)
  *
  * Huom: /json endpoint palauttaa flat-muodon:
- *   { indicator: 3064, region: 46, year: 2023, gender: "total", value: 196 }
+ *   { indicator: 5641, region: 46, year: 2023, gender: "total", value: 196 }
  * Region on pelkkä ID → tarvitaan /regions endpoint koodimappiin.
  */
 
@@ -121,7 +121,7 @@ export async function fetchNationalAverage(
   const data: SotkanetRawDataPoint[] = await dataResponse.json();
 
   // Koko Suomi: etsitään region jolla category on tyhjä/MANNER-SUOMI tai id 1
-  const national = data.find(p => {
+  const national = data.find((p) => {
     const region = regionMap.get(p.region);
     return region && (region.id === 1 || region.code === '' || region.category === 'MAA');
   });

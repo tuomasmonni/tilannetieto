@@ -9,7 +9,7 @@ export default function HealthSettings() {
   const isDark = theme === 'dark';
   const [infoExpanded, setInfoExpanded] = useState(false);
 
-  const selectedIndicator = SOTKANET_INDICATORS.find(i => i.id === health.indicator);
+  const selectedIndicator = SOTKANET_INDICATORS.find((i) => i.id === health.indicator);
 
   return (
     <div className="space-y-3">
@@ -27,8 +27,10 @@ export default function HealthSettings() {
               : 'bg-white text-zinc-900 border-zinc-300 focus:border-blue-500'
           }`}
         >
-          {SOTKANET_INDICATORS.map(ind => (
-            <option key={ind.id} value={ind.id}>{ind.label}</option>
+          {SOTKANET_INDICATORS.map((ind) => (
+            <option key={ind.id} value={ind.id}>
+              {ind.label}
+            </option>
           ))}
         </select>
         {selectedIndicator && (
@@ -52,8 +54,10 @@ export default function HealthSettings() {
               : 'bg-white text-zinc-900 border-zinc-300 focus:border-blue-500'
           }`}
         >
-          {['2023', '2022', '2021', '2020', '2019'].map(year => (
-            <option key={year} value={year}>{year}</option>
+          {['2024', '2023', '2022', '2021', '2020', '2019'].map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
           ))}
         </select>
       </div>
@@ -68,15 +72,25 @@ export default function HealthSettings() {
         >
           <span>ℹ️</span>
           <span>Tietoa datasta</span>
-          <span className={`transition-transform text-[10px] ${infoExpanded ? 'rotate-180' : ''}`}>▼</span>
+          <span className={`transition-transform text-[10px] ${infoExpanded ? 'rotate-180' : ''}`}>
+            ▼
+          </span>
         </button>
         {infoExpanded && (
-          <div className={`mt-2 p-2.5 rounded-lg text-xs leading-relaxed space-y-1.5 ${
-            isDark ? 'bg-zinc-800/80 text-zinc-400' : 'bg-zinc-50 text-zinc-600'
-          }`}>
-            <p><span className="font-semibold">Lähde:</span> THL / Sotkanet (CC BY 4.0)</p>
-            <p><span className="font-semibold">API:</span> sotkanet.fi/rest/1.1/</p>
-            <p><span className="font-semibold">Päivitys:</span> Vuosittain / neljännesvuosittain</p>
+          <div
+            className={`mt-2 p-2.5 rounded-lg text-xs leading-relaxed space-y-1.5 ${
+              isDark ? 'bg-zinc-800/80 text-zinc-400' : 'bg-zinc-50 text-zinc-600'
+            }`}
+          >
+            <p>
+              <span className="font-semibold">Lähde:</span> THL / Sotkanet (CC BY 4.0)
+            </p>
+            <p>
+              <span className="font-semibold">API:</span> sotkanet.fi/rest/1.1/
+            </p>
+            <p>
+              <span className="font-semibold">Päivitys:</span> Vuosittain / neljännesvuosittain
+            </p>
           </div>
         )}
       </div>
